@@ -1,44 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:background="?attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/txtExpenseType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Expense Type"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/txtExpenseAmount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="₹0.00"
-        android:textColor="@android:color/holo_red_dark" />
-
-    <TextView
-        android:id="@+id/txtExpenseDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Date: 01-01-2025" />
-
-
-    <TextView
-        android:id="@+id/textViewAmount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Amount"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textViewDescription"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvExpanseDescription"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Description"
-        android:textSize="16sp" />
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="?android:textColorPrimary" />
 
+    <TextView
+        android:id="@+id/tvExpanseAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="₹0.00"
+        android:textSize="14sp"
+        android:textColor="?android:textColorSecondary" />
+
+    <TextView
+        android:id="@+id/tvExpanseDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textSize="14sp"
+        android:textColor="?android:textColorSecondary" />
 </LinearLayout>

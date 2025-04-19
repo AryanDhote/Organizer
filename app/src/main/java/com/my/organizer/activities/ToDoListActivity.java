@@ -2,38 +2,40 @@ package com.my.organizer.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.my.organizer.R;
 import com.my.organizer.adapters.ToDoAdapter;
+import com.my.organizer.models.ToDo;
 import com.my.organizer.viewmodel.ToDoViewModel;
 
 public class ToDoListActivity extends AppCompatActivity {
-    private RecyclerView recyclerView;
-    private FloatingActionButton fabAddToDo;
+
     private ToDoViewModel toDoViewModel;
+    private ToDoAdapter adapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list);
 
-        // Initialize UI elements
-        recyclerView = findViewById(R.id.recyclerViewToDos);
-        fabAddToDo = findViewById(R.id.fabAddToDo);
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewToDos);
+        FloatingActionButton fabAddToDo = findViewById(R.id.fabAddToDo);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        ToDoAdapter adapter = new ToDoAdapter();
+        recyclerView.setHasFixedSize(true);
+
+        adapter = new ToDoAdapter(this); // ✅ Pass context to adapter
         recyclerView.setAdapter(adapter);
 
-        // ViewModel setup
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
-        toDoViewModel.getAllToDos().observe(this, adapter::submitList);
+        toDoViewModel.getAllToDos().observe(this, todos -> adapter.submitList(todos));
 
-        // Add new To-Do
         fabAddToDo.setOnClickListener(v -> {
             Intent intent = new Intent(ToDoListActivity.this, AddEditToDoActivity.class);
             startActivity(intent);

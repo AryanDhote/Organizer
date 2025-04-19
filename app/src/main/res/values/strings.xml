@@ -45,6 +45,29 @@
 
     <string name="tab_navigation">Tab Navigation</string>
     <string name="todo">TODO</string>
+    <string name="description">Description</string>
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="save_expense">Save Expense</string>
+    <string name="title">Title</string>
+    <string name="save_to_do">Save To-Do</string>
+    <string name="add_to_do">Add To-Do</string>
+    <string name="tab_layout_description">Tabs for different categories</string>
+    <string name="expense_type">Expense Type</string>
+    <string name="_0_00">₹0.00</string>
+    <string name="date_01_01_2025">Date: 01–01-2025</string>
+    <string name="to_do_title">To-Do Title</string>
+    <string name="to_do_description">To-Do Description</string>
+    <string name="to_do_tasks_0">To-Do Tasks: 0</string>
+    <string name="tap_to_view_tasks">Tap to view tasks</string>
+    <string name="total_expenses_0">Total Expenses: ₹0</string>
+    <string name="tap_to_view_expenses">Tap to view expenses</string>
+    <string name="select_date">Select Date</string>
+    <string name="add_todo">add_todo</string>
+    <string name="add_new_expense">Add New Expense</string>
+    <string name="add_new_to_do">Add New To-Do</string>
+    <string name="total_to_dos_0">Total To-Dos: 0</string>
+    <string name="total_expenses_0_00">Total Expenses: ₹0.00</string>
 
 
 </resources>

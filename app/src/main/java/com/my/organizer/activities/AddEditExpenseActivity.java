@@ -1,81 +1,76 @@
 package com.my.organizer.activities;
 
-import android.content.Intent;
+import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.my.organizer.R;
 import com.my.organizer.models.Expense;
 import com.my.organizer.viewmodel.ExpenseViewModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class AddEditExpenseActivity extends AppCompatActivity {
 
-    private EditText editTextAmount, editTextDescription, editTextCategory;
-    private Button buttonSave;
+    private EditText edtAmount, edtDescription, edtDate;
+    private Button btnSave;
     private ExpenseViewModel expenseViewModel;
-    private int expenseId = -1;  // Default -1 means it's a new expense
+    private Date selectedDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_edit_expense);
 
-        editTextAmount = findViewById(R.id.editTextAmount);
-        editTextDescription = findViewById(R.id.editTextDescription);
-        editTextCategory = findViewById(R.id.editTextCategory);
-        buttonSave = findViewById(R.id.buttonSaveExpense);
+        edtAmount = findViewById(R.id.edtAmount);
+        edtDescription = findViewById(R.id.edtDescription);
+        edtDate = findViewById(R.id.edtDate);
+        btnSave = findViewById(R.id.btnSave);
 
         expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);
 
-        Intent intent = getIntent();
-        if (intent.hasExtra("expense_id")) {
-            setTitle("Edit Expense");
-            expenseId = intent.getIntExtra("expense_id", -1);
-            editTextAmount.setText(intent.getStringExtra("expense_amount"));
-            editTextDescription.setText(intent.getStringExtra("expense_description"));
-            editTextCategory.setText(intent.getStringExtra("expense_category"));
-        } else {
-            setTitle("Add Expense");
-        }
+        edtDate.setOnClickListener(view -> showDatePickerDialog());
 
-        buttonSave.setOnClickListener(view -> saveExpense());
+        btnSave.setOnClickListener(view -> saveExpense());
+    }
+
+    private void showDatePickerDialog() {
+        final Calendar calendar = Calendar.getInstance();
+        new DatePickerDialog(this,
+                (view, year, month, dayOfMonth) -> {
+                    calendar.set(year, month, dayOfMonth);
+                    selectedDate = calendar.getTime();
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    edtDate.setText(sdf.format(selectedDate));
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+        ).show();
     }
 
     private void saveExpense() {
-        String amountText = editTextAmount.getText().toString().trim();
-        String description = editTextDescription.getText().toString().trim();
-        String category = editTextCategory.getText().toString().trim();
+        String description = edtDescription.getText().toString().trim();
+        String amountStr = edtAmount.getText().toString().trim();
 
-        // Check if fields are empty
-        if (amountText.isEmpty() || description.isEmpty() || category.isEmpty()) {
+        if (description.isEmpty() || amountStr.isEmpty() || selectedDate == null) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Validate numeric input
-        double amount;
-        try {
-            amount = Double.parseDouble(amountText);
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid amount format", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        double amount = Double.parseDouble(amountStr);
 
-        Expense expense = new Expense(description,amount,  category);
-
-        if (expenseId != -1) {
-            expense.setId(expenseId);
-            expenseViewModel.update(expense);
-        } else {
-            expenseViewModel.insert(expense);
-        }
-
+        Expense expense = new Expense(description, amount, selectedDate);
+        expenseViewModel.insert(expense);
         Toast.makeText(this, "Expense saved", Toast.LENGTH_SHORT).show();
         finish();
     }
-
 }

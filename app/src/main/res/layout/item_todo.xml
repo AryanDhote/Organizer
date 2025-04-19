@@ -1,42 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:background="?attr/selectableItemBackground">
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tvToDoDate"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:text="Date"
+        android:textSize="14sp"
+        android:textColor="?android:textColorSecondary" />
 
-        <TextView
-            android:id="@+id/txtToDoTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="To-Do Title"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtToDoDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="To-Do Description"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-    <!-- ✅ Fixed ImageButton with correct size and constraints -->
-    <ImageButton
-        android:id="@+id/buttonDeleteToDo"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_delete"
-        android:contentDescription="@string/delete_to_do"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:scaleType="center"
-        android:padding="12dp"/>
+    <TextView
+        android:id="@+id/tvToDoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="?android:textColorPrimary" />
 </LinearLayout>

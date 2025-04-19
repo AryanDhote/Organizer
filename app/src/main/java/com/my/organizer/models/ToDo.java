@@ -2,29 +2,25 @@ package com.my.organizer.models;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import java.util.Date;
 
 @Entity(tableName = "todos")
 public class ToDo {
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private String task;
-    private boolean completed;
+    private String title;
+    private String description;
+    private Date date;
 
-    // Corrected constructor
-    public ToDo(String task, boolean completed) {
-        this.task = task;
-        this.completed = completed;
+    public ToDo(String title, String description, Date date) {
+        this.title = title;
+        this.description = description;
+        this.date = date;
     }
 
-    // Empty constructor for Room
-    public ToDo(String title, String description) {}
-
-    public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
-    public String getTask() { return task; }
-    public void setTask(String task) { this.task = task; }
-
-    public boolean isCompleted() { return completed; }
-    public void setCompleted(boolean completed) { this.completed = completed; }
+    public int getId() { return id; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public Date getDate() { return date; }
 }

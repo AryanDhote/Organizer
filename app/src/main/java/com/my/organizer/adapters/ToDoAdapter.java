@@ -1,81 +1,62 @@
 package com.my.organizer.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.my.organizer.R;
 import com.my.organizer.models.ToDo;
 
-public class ToDoAdapter extends ListAdapter<ToDo, ToDoAdapter.ToDoViewHolder> {
-    private OnItemClickListener listener;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
-    public ToDoAdapter() {
-        super(DIFF_CALLBACK);
+public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder> {
+
+    private List<ToDo> toDoList = new ArrayList<>();
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
+    private final LayoutInflater inflater;
+
+    public ToDoAdapter(Context context) {
+        this.inflater = LayoutInflater.from(context);
     }
 
-    private static final DiffUtil.ItemCallback<ToDo> DIFF_CALLBACK = new DiffUtil.ItemCallback<ToDo>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull ToDo oldItem, @NonNull ToDo newItem) {
-            return oldItem.getId() == newItem.getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull ToDo oldItem, @NonNull ToDo newItem) {
-            return oldItem.getTask().equals(newItem.getTask()) &&
-                    oldItem.isCompleted() == newItem.isCompleted();
-        }
-    };
+    public void submitList(List<ToDo> list) {
+        this.toDoList = list;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
     public ToDoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_todo, parent, false);
+        View view = inflater.inflate(R.layout.item_todo, parent, false);
         return new ToDoViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ToDoViewHolder holder, int position) {
-        ToDo toDo = getItem(position);
-        holder.textViewTask.setText(toDo.getTask()); // ✅ Fixed: Used getTask()
-
-        // Click Listener for item
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onItemClick(toDo);
-            }
-        });
-
-        // Click Listener for delete button
-        holder.buttonDelete.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onDeleteClick(toDo);
-            }
-        });
+        ToDo toDo = toDoList.get(position);
+        holder.tvTitle.setText(toDo.getTitle());
+        holder.tvDate.setText(dateFormat.format(toDo.getDate()));
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(ToDo toDo);
-        void onDeleteClick(ToDo toDo);
+    @Override
+    public int getItemCount() {
+        return toDoList.size();
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
-
-    public static class ToDoViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewTask;
-        ImageButton buttonDelete;
+    static class ToDoViewHolder extends RecyclerView.ViewHolder {
+        TextView tvTitle, tvDate;
 
         public ToDoViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewTask = itemView.findViewById(R.id.txtToDoTitle); // ✅ Updated ID
-            buttonDelete = itemView.findViewById(R.id.buttonDeleteToDo);
+            tvTitle = itemView.findViewById(R.id.tvToDoTitle);
+            tvDate = itemView.findViewById(R.id.tvToDoDate);
         }
     }
 }
