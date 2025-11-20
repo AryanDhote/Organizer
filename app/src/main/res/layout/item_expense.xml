@@ -1,32 +1,58 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground">
+    android:layout_margin="8dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    android:padding="16dp"
+    tools:context=".activities.ExpenseListActivity">
 
-    <TextView
-        android:id="@+id/tvExpanseDescription"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Description"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:textColor="?android:textColorPrimary" />
+        android:paddingBottom="8dp">
 
-    <TextView
-        android:id="@+id/tvExpanseAmount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="₹0.00"
-        android:textSize="14sp"
-        android:textColor="?android:textColorSecondary" />
+        <!-- Expense Amount -->
+        <TextView
+            android:id="@+id/tv_expense_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$0.00"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
 
-    <TextView
-        android:id="@+id/tvExpanseDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Date"
-        android:textSize="14sp"
-        android:textColor="?android:textColorSecondary" />
-</LinearLayout>
+        <!-- Expense Type -->
+        <TextView
+            android:id="@+id/tv_expense_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Expense Type: Food"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"/>
+
+        <!-- Expense Note -->
+        <TextView
+            android:id="@+id/tv_expense_note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Note: Dinner at restaurant"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"/>
+
+        <!-- Expense Date -->
+        <TextView
+            android:id="@+id/tv_expense_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date: 01/01/2025"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"/>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

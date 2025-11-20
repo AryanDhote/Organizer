@@ -1,21 +1,24 @@
 package com.my.organizer.viewmodel;
 
 import android.app.Application;
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import com.my.organizer.database.AppDatabase;
+import androidx.lifecycle.ViewModel;
+
+import com.my.organizer.database.ExpenseRepository;
 import com.my.organizer.models.Expense;
+
 import java.util.List;
 
 public class ExpenseViewModel extends AndroidViewModel {
-    private final AppDatabase db;
-    private final LiveData<List<Expense>> allExpenses;
 
-    public ExpenseViewModel(@NonNull Application application) {
+    private ExpenseRepository expenseRepository;
+    private LiveData<List<Expense>> allExpenses;
+
+    public ExpenseViewModel(Application application) {
         super(application);
-        db = AppDatabase.getInstance(application);
-        allExpenses = db.expenseDao().getAllExpenses();
+        expenseRepository = new ExpenseRepository(application);
+        allExpenses = expenseRepository.getAllExpenses();
     }
 
     public LiveData<List<Expense>> getAllExpenses() {
@@ -23,14 +26,18 @@ public class ExpenseViewModel extends AndroidViewModel {
     }
 
     public void insert(Expense expense) {
-        AppDatabase.databaseWriteExecutor.execute(() -> db.expenseDao().insert(expense));
+        expenseRepository.insert(expense);
     }
 
     public void update(Expense expense) {
-        AppDatabase.databaseWriteExecutor.execute(() -> db.expenseDao().update(expense));
+        expenseRepository.update(expense);
     }
 
     public void delete(Expense expense) {
-        AppDatabase.databaseWriteExecutor.execute(() -> db.expenseDao().delete(expense));
+        expenseRepository.delete(expense);
+    }
+
+    public void deleteAllExpenses() {
+        expenseRepository.deleteAllExpenses();
     }
 }

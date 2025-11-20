@@ -1,21 +1,24 @@
 package com.my.organizer.viewmodel;
 
 import android.app.Application;
-import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import com.my.organizer.database.AppDatabase;
+import androidx.lifecycle.ViewModel;
+
+import com.my.organizer.database.ToDoRepository;
 import com.my.organizer.models.ToDo;
+
 import java.util.List;
 
 public class ToDoViewModel extends AndroidViewModel {
-    private final AppDatabase db;
-    private final LiveData<List<ToDo>> allToDos;
 
-    public ToDoViewModel(@NonNull Application application) {
+    private ToDoRepository toDoRepository;
+    private LiveData<List<ToDo>> allToDos;
+
+    public ToDoViewModel(Application application) {
         super(application);
-        db = AppDatabase.getInstance(application);
-        allToDos = db.toDoDao().getAllToDos();
+        toDoRepository = new ToDoRepository(application);
+        allToDos = toDoRepository.getAllToDos();
     }
 
     public LiveData<List<ToDo>> getAllToDos() {
@@ -23,14 +26,18 @@ public class ToDoViewModel extends AndroidViewModel {
     }
 
     public void insert(ToDo toDo) {
-        AppDatabase.databaseWriteExecutor.execute(() -> db.toDoDao().insertToDo(toDo));
+        toDoRepository.insert(toDo);
     }
 
     public void update(ToDo toDo) {
-        AppDatabase.databaseWriteExecutor.execute(() -> db.toDoDao().updateToDo(toDo));
+        toDoRepository.update(toDo);
     }
 
     public void delete(ToDo toDo) {
-        AppDatabase.databaseWriteExecutor.execute(() -> db.toDoDao().deleteToDo(toDo));
+        toDoRepository.delete(toDo);
+    }
+
+    public void deleteAllToDos() {
+        toDoRepository.deleteAllToDos();
     }
 }
