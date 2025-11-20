@@ -48,4 +48,8 @@ public class ToDoRepository {
     public void delete(ToDo todo) {
         AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.delete(todo));
     }
+
+    public void deleteAllToDos() {
+        AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.deleteAllToDos());
+    }
 }

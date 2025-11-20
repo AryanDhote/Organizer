@@ -44,4 +44,8 @@ public class ExpenseRepository {
     public void delete(Expense expense) {
         AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.delete(expense));
     }
+
+    public void deleteAllExpenses() {
+        AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.deleteAllExpenses());
+    }
 }

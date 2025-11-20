@@ -35,4 +35,6 @@ public interface ExpenseDao {
     // NEW: fetch one Expense by its primary key
     @Query("SELECT * FROM expense_table WHERE id = :id")
     LiveData<Expense> getExpenseById(int id);
+
+    void deleteAllExpenses();
 }

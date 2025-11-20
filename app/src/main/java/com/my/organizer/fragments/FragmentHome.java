@@ -2,16 +2,17 @@ package com.my.organizer.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Button;
 
 import com.my.organizer.R;
 import com.my.organizer.viewmodel.HomeViewModel;
@@ -20,49 +21,63 @@ public class FragmentHome extends Fragment {
 
     private HomeViewModel homeViewModel;
     private TextView todoCountTextView;
-    private TextView expenseCountTextView;
     private TextView expenseTotalTextView;
+    private Button btnAddToDo;
+    private Button btnAddExpense;
 
     public FragmentHome() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_home, container, false);
+    }
 
-        // Initialize UI components
-        todoCountTextView = view.findViewById(R.id.text_todo_count);
-        expenseCountTextView = view.findViewById(R.id.text_expense_count);
-        expenseTotalTextView = view.findViewById(R.id.text_expense_total);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Bind views (IDs from your provided fragment_home.xml)
+        todoCountTextView = view.findViewById(R.id.tv_todo_count);
+        expenseTotalTextView = view.findViewById(R.id.tv_expense_total);
+        btnAddToDo = view.findViewById(R.id.btn_add_todo);
+        btnAddExpense = view.findViewById(R.id.btn_add_expense);
 
         // Initialize ViewModel
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
-        // Observing data from ViewModel
+        // Observe total ToDo count (Integer)
         homeViewModel.getTotalToDoCount().observe(getViewLifecycleOwner(), new Observer<Integer>() {
             @Override
             public void onChanged(Integer totalToDoCount) {
-                todoCountTextView.setText(String.valueOf(totalToDoCount));
+                // defensive: handle null
+                int count = (totalToDoCount == null) ? 0 : totalToDoCount;
+                todoCountTextView.setText("Total Tasks: " + count);
             }
         });
 
-        homeViewModel.getTotalExpenseCount().observe(getViewLifecycleOwner(), new Observer<Integer>() {
-            @Override
-            public void onChanged(Integer totalExpenseCount) {
-                expenseCountTextView.setText(String.valueOf(totalExpenseCount));
-            }
-        });
-
+        // Observe total expense amount (Double)
         homeViewModel.getTotalExpenseAmount().observe(getViewLifecycleOwner(), new Observer<Double>() {
             @Override
             public void onChanged(Double totalExpenseAmount) {
-                expenseTotalTextView.setText(String.format("$%.2f", totalExpenseAmount));
+                double amount = (totalExpenseAmount == null) ? 0.0 : totalExpenseAmount;
+                // Format using Rupee symbol
+                expenseTotalTextView.setText(String.format("Total Expenses: ₹%.2f", amount));
             }
         });
 
-        return view;
+        // Button click hooks — currently no-op; host Activity/Fragment can set behavior
+        btnAddToDo.setOnClickListener(v -> {
+            // Example: start AddEditToDoActivity or notify host
+            // Currently empty — replace with navigation or callback as needed.
+        });
+
+        btnAddExpense.setOnClickListener(v -> {
+            // Example: start AddEditExpenseActivity or notify host
+            // Currently empty — replace with navigation or callback as needed.
+        });
     }
 }

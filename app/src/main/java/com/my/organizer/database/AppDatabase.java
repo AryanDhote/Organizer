@@ -17,30 +17,23 @@ import java.util.concurrent.Executors;
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static volatile AppDatabase INSTANCE;
+    private static final String DB_NAME = "organizer_db";
+    private static volatile AppDatabase instance;
 
-    // Executor for off–main‑thread database writes
-    private static final int NUMBER_OF_THREADS = 4;
+    // Executor used by repositories for background DB operations
     public static final ExecutorService databaseWriteExecutor =
-            Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+            Executors.newFixedThreadPool(4);
 
     public abstract ToDoDao toDoDao();
     public abstract ExpenseDao expenseDao();
 
-    public static AppDatabase getInstance(Context context) {
-        if (INSTANCE == null) {
-            synchronized (AppDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
-                                    context.getApplicationContext(),
-                                    AppDatabase.class,
-                                    "my_organizer_db"
-                            )
-                            .fallbackToDestructiveMigration()
-                            .build();
-                }
-            }
+    public static synchronized AppDatabase getInstance(Context context) {
+        if (instance == null) {
+            instance = Room.databaseBuilder(context.getApplicationContext(),
+                            AppDatabase.class, DB_NAME)
+                    .fallbackToDestructiveMigration() // keep for dev; replace with migrations in prod
+                    .build();
         }
-        return INSTANCE;
+        return instance;
     }
 }

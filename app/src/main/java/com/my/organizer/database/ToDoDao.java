@@ -23,7 +23,8 @@ public interface ToDoDao {
     @Delete
     void delete(ToDo todo);
 
-    @Query("SELECT * FROM todo_table ORDER BY date ASC")
+    // Use the actual column name from your entity: dueDate
+    @Query("SELECT * FROM todo_table ORDER BY dueDate ASC")
     LiveData<List<ToDo>> getAllToDos();
 
     @Query("SELECT COUNT(*) FROM todo_table")
@@ -32,6 +33,10 @@ public interface ToDoDao {
     @Query("SELECT * FROM todo_table WHERE id = :id")
     LiveData<ToDo> getToDoById(int id);
 
-    @Query("SELECT * FROM todo_table WHERE date < :currentTime")
+    // Compare dueDate with a timestamp (millis). We'll store Date as long via TypeConverter.
+    @Query("SELECT * FROM todo_table WHERE dueDate < :currentTime")
     LiveData<List<ToDo>> getExpiredToDos(long currentTime);
+
+    @Query("DELETE FROM todo_table")
+    void deleteAllToDos();
 }

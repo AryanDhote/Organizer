@@ -1,7 +1,6 @@
 package com.my.organizer.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,23 +41,38 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ToDoViewHolder holder, int position) {
+        // defensive checks
+        if (toDoList == null || position < 0 || position >= toDoList.size()) return;
+
         ToDo toDo = toDoList.get(position);
 
-        holder.title.setText(toDo.getTitle());
-        holder.description.setText(toDo.getDescription());
+        holder.title.setText(toDo.getTitle() != null ? toDo.getTitle() : "");
+        holder.description.setText(toDo.getDescription() != null ? toDo.getDescription() : "");
 
+        // map to your layout id tv_todo_due_date
         Date dueDate = toDo.getDueDate();
-        String formattedDate = DateFormat.format("dd MMM yyyy", dueDate).toString();
-        holder.date.setText(formattedDate);
+        if (dueDate != null) {
+            CharSequence formattedDate = DateFormat.format("dd MMM yyyy", dueDate);
+            holder.date.setText(formattedDate);
+        } else {
+            holder.date.setText(""); // or "No due date"
+        }
 
-        // Highlight expired tasks
+        // Determine error container color resource if defined, otherwise fallback
+        int errorContainerColorResId = context.getResources()
+                .getIdentifier("md_theme_errorContainer", "color", context.getPackageName());
+        int errorContainerColor = (errorContainerColorResId != 0)
+                ? ContextCompat.getColor(context, errorContainerColorResId)
+                : ContextCompat.getColor(context, android.R.color.holo_red_light);
+
+        // highlight expired tasks (only if dueDate exists)
         Date now = new Date();
         if (dueDate != null && dueDate.before(now)) {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.md_theme_errorContainer));
-            holder.title.setTextColor(Color.RED);
+            holder.itemView.setBackgroundColor(errorContainerColor);
+            holder.title.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
         } else {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-            holder.title.setTextColor(ContextCompat.getColor(context, R.color.black));
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
+            holder.title.setTextColor(ContextCompat.getColor(context, android.R.color.black));
         }
     }
 
@@ -68,13 +82,15 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
     }
 
     static class ToDoViewHolder extends RecyclerView.ViewHolder {
-        TextView title, description, date;
+        TextView title, description, date, expiryTime;
 
         public ToDoViewHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.text_title);
-            description = itemView.findViewById(R.id.text_description);
-            date = itemView.findViewById(R.id.text_due_date);
+            // IDs now match your item_todo.xml
+            title = itemView.findViewById(R.id.tv_todo_title);
+            description = itemView.findViewById(R.id.tv_todo_description);
+            date = itemView.findViewById(R.id.tv_todo_due_date);
+            expiryTime = itemView.findViewById(R.id.tv_todo_expiry_time); // present in layout
         }
     }
 }
