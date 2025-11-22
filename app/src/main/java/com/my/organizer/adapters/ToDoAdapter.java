@@ -6,14 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.my.organizer.R;
 import com.my.organizer.models.ToDo;
-
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +17,13 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
 
     private List<ToDo> toDoList;
     private final Context context;
+    private OnToDoClickListener listener;
+
+    public interface OnToDoClickListener {
+        void onToDoClick(ToDo toDo);
+    }
+
+    public void setOnToDoClickListener(OnToDoClickListener l) { this.listener = l; }
 
     public ToDoAdapter(Context context) {
         this.context = context;
@@ -34,46 +37,26 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
     @NonNull
     @Override
     public ToDoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_todo, parent, false);
-        return new ToDoViewHolder(view);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_todo, parent, false);
+        return new ToDoViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ToDoViewHolder holder, int position) {
-        // defensive checks
-        if (toDoList == null || position < 0 || position >= toDoList.size()) return;
+        ToDo t = toDoList.get(position);
 
-        ToDo toDo = toDoList.get(position);
+        holder.title.setText(t.getTitle() == null ? "" : t.getTitle());
+        holder.description.setText(t.getDescription() == null ? "" : t.getDescription());
 
-        holder.title.setText(toDo.getTitle() != null ? toDo.getTitle() : "");
-        holder.description.setText(toDo.getDescription() != null ? toDo.getDescription() : "");
+        Date d = t.getDueDate();
+        String formatted = d == null ? "" : DateFormat.format("dd MMM yyyy", d).toString();
+        holder.dueDate.setText(formatted);
 
-        // map to your layout id tv_todo_due_date
-        Date dueDate = toDo.getDueDate();
-        if (dueDate != null) {
-            CharSequence formattedDate = DateFormat.format("dd MMM yyyy", dueDate);
-            holder.date.setText(formattedDate);
-        } else {
-            holder.date.setText(""); // or "No due date"
-        }
+        holder.expiryTime.setText(t.getExpiryTime() == null ? "" : t.getExpiryTime());
 
-        // Determine error container color resource if defined, otherwise fallback
-        int errorContainerColorResId = context.getResources()
-                .getIdentifier("md_theme_errorContainer", "color", context.getPackageName());
-        int errorContainerColor = (errorContainerColorResId != 0)
-                ? ContextCompat.getColor(context, errorContainerColorResId)
-                : ContextCompat.getColor(context, android.R.color.holo_red_light);
-
-        // highlight expired tasks (only if dueDate exists)
-        Date now = new Date();
-        if (dueDate != null && dueDate.before(now)) {
-            holder.itemView.setBackgroundColor(errorContainerColor);
-            holder.title.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
-        } else {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
-            holder.title.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-        }
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onToDoClick(t);
+        });
     }
 
     @Override
@@ -82,15 +65,14 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ToDoViewHolder
     }
 
     static class ToDoViewHolder extends RecyclerView.ViewHolder {
-        TextView title, description, date, expiryTime;
+        TextView title, description, dueDate, expiryTime;
 
-        public ToDoViewHolder(@NonNull View itemView) {
+        ToDoViewHolder(@NonNull View itemView) {
             super(itemView);
-            // IDs now match your item_todo.xml
             title = itemView.findViewById(R.id.tv_todo_title);
             description = itemView.findViewById(R.id.tv_todo_description);
-            date = itemView.findViewById(R.id.tv_todo_due_date);
-            expiryTime = itemView.findViewById(R.id.tv_todo_expiry_time); // present in layout
+            dueDate = itemView.findViewById(R.id.tv_todo_due_date);
+            expiryTime = itemView.findViewById(R.id.tv_todo_expiry_time);
         }
     }
 }

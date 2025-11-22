@@ -20,7 +20,7 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final String DB_NAME = "organizer_db";
     private static volatile AppDatabase instance;
 
-    // Executor used by repositories for background DB operations
+    // Executor used for DB operations from repositories
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(4);
 
@@ -31,7 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
         if (instance == null) {
             instance = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, DB_NAME)
-                    .fallbackToDestructiveMigration() // keep for dev; replace with migrations in prod
+                    .fallbackToDestructiveMigration() // keep for development; replace with migrations in prod
                     .build();
         }
         return instance;

@@ -23,7 +23,7 @@ public interface ExpenseDao {
     @Delete
     void delete(Expense expense);
 
-    @Query("SELECT * FROM expense_table ORDER BY date ASC")
+    @Query("SELECT * FROM expense_table ORDER BY date DESC")
     LiveData<List<Expense>> getAllExpenses();
 
     @Query("SELECT SUM(amount) FROM expense_table")
@@ -32,9 +32,9 @@ public interface ExpenseDao {
     @Query("SELECT COUNT(*) FROM expense_table")
     LiveData<Integer> getTotalExpenseCount();
 
-    // NEW: fetch one Expense by its primary key
     @Query("SELECT * FROM expense_table WHERE id = :id")
     LiveData<Expense> getExpenseById(int id);
 
+    @Query("DELETE FROM expense_table")
     void deleteAllExpenses();
 }

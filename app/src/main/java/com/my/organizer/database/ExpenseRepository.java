@@ -1,6 +1,7 @@
 package com.my.organizer.database;
 
 import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 
 import com.my.organizer.models.Expense;
@@ -8,17 +9,17 @@ import com.my.organizer.models.Expense;
 import java.util.List;
 
 public class ExpenseRepository {
-
     private final ExpenseDao expenseDao;
     private final LiveData<List<Expense>> allExpenses;
     private final LiveData<Double> totalExpenseAmount;
+    private final LiveData<Integer> totalExpenseCount;
 
     public ExpenseRepository(Application application) {
-        // Use the correct method name
         AppDatabase db = AppDatabase.getInstance(application);
         expenseDao = db.expenseDao();
         allExpenses = expenseDao.getAllExpenses();
         totalExpenseAmount = expenseDao.getTotalExpenseAmount();
+        totalExpenseCount = expenseDao.getTotalExpenseCount();
     }
 
     public LiveData<List<Expense>> getAllExpenses() {
@@ -27,6 +28,10 @@ public class ExpenseRepository {
 
     public LiveData<Double> getTotalExpenseAmount() {
         return totalExpenseAmount;
+    }
+
+    public LiveData<Integer> getTotalExpenseCount() {
+        return totalExpenseCount;
     }
 
     public LiveData<Expense> getExpenseById(int id) {
@@ -46,6 +51,6 @@ public class ExpenseRepository {
     }
 
     public void deleteAllExpenses() {
-        AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.deleteAllExpenses());
+        AppDatabase.databaseWriteExecutor.execute(expenseDao::deleteAllExpenses);
     }
 }

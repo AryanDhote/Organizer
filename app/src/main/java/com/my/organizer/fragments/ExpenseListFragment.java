@@ -1,67 +1,89 @@
 package com.my.organizer.fragments;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.google.android.material.button.MaterialButton;
+
 import com.my.organizer.R;
 import com.my.organizer.adapters.ExpenseAdapter;
 import com.my.organizer.models.Expense;
 import com.my.organizer.viewmodel.ExpenseViewModel;
-import com.my.organizer.activities.AddEditExpenseActivity;
-import java.util.List;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ExpenseListFragment extends Fragment {
 
-    private ExpenseViewModel expenseViewModel;
-    private ExpenseAdapter expenseAdapter;
+    public interface OnExpenseListActionListener {
+        void onAddExpense();
+        void onEditExpense(Expense expense);
 
-    public ExpenseListFragment() {
-        // Required empty public constructor
+        // ----------------------------
+        // ExpenseListFragment.OnExpenseListActionListener
+        // ----------------------------
+        void onAddExpenseFromList();
+
+        void onEditExpenseFromList(Expense expense);
+    }
+
+    private OnExpenseListActionListener listener;
+    private ExpenseViewModel expenseViewModel;
+    private ExpenseAdapter adapter;
+
+    public ExpenseListFragment() { /* required empty */ }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnExpenseListActionListener) {
+            listener = (OnExpenseListActionListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnExpenseListActionListener");
+        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_expense_list, container, false);
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+    }
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_expenses);
-        MaterialButton addBtn = view.findViewById(R.id.btn_add_expense);
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_expense_list, container, false);
+    }
 
-        // Set up RecyclerView and Adapter
-        expenseAdapter = new ExpenseAdapter();
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(expenseAdapter);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        RecyclerView rv = view.findViewById(R.id.rv_expenses_fragment);
+        FloatingActionButton fabAdd = view.findViewById(R.id.fab_add_expense);
 
-        // ViewModel for managing Expense items
+        adapter = new ExpenseAdapter();
+        rv.setLayoutManager(new LinearLayoutManager(requireContext()));
+        rv.setAdapter(adapter);
+
+        adapter.setOnExpenseClickListener(expense -> {
+            if (listener != null) listener.onEditExpense(expense);
+        });
+
         expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);
-        expenseViewModel.getAllExpenses().observe(getViewLifecycleOwner(), new Observer<List<Expense>>() {
-            @Override
-            public void onChanged(List<Expense> expenses) {
-                expenseAdapter.setExpenseList(expenses); // Update adapter with new list
-            }
+        expenseViewModel.getAllExpenses().observe(getViewLifecycleOwner(), expenses -> {
+            adapter.setExpenseList(expenses);
         });
 
-        // Add button opens the Add/Edit Expense activity
-        addBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AddEditExpenseActivity.class);
-            startActivity(intent);
+        fabAdd.setOnClickListener(v -> {
+            if (listener != null) listener.onAddExpense();
         });
-
-        // Set click listener for the adapter to handle item clicks
-        expenseAdapter.setOnExpenseClickListener(expense -> {
-            Intent intent = new Intent(getActivity(), AddEditExpenseActivity.class);
-            intent.putExtra("expense", expense);
-            startActivity(intent);
-        });
-
-        return view;
     }
 }

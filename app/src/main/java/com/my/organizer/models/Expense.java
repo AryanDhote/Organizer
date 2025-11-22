@@ -3,11 +3,12 @@ package com.my.organizer.models;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
-import java.io.Serializable;  // Implement Serializable
+
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "expense_table")
-public class Expense implements Serializable {  // Implements Serializable
+public class Expense implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -31,7 +32,7 @@ public class Expense implements Serializable {  // Implements Serializable
         this.note = note;
     }
 
-    // Getters and setters
+    // Getters + setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -46,7 +47,4 @@ public class Expense implements Serializable {  // Implements Serializable
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
-
-    public String getDescription() {
-    }
 }

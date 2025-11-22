@@ -9,7 +9,6 @@ import com.my.organizer.models.ToDo;
 import java.util.List;
 
 public class ToDoRepository {
-
     private final ToDoDao toDoDao;
     private final LiveData<List<ToDo>> allToDos;
     private final LiveData<Integer> totalToDoCount;
@@ -50,6 +49,6 @@ public class ToDoRepository {
     }
 
     public void deleteAllToDos() {
-        AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.deleteAllToDos());
+        AppDatabase.databaseWriteExecutor.execute(toDoDao::deleteAllToDos);
     }
 }

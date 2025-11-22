@@ -6,10 +6,12 @@ import com.my.organizer.models.ExpenseType;
 
 import java.util.Date;
 
-
+/**
+ * Room type converters for Date and ExpenseType.
+ */
 public class Converters {
 
-    // --- Date converters (unchanged) ---
+    // --- Date <-> Long ---
     @TypeConverter
     public static Date fromTimestamp(Long value) {
         return value == null ? null : new Date(value);
@@ -20,10 +22,15 @@ public class Converters {
         return date == null ? null : date.getTime();
     }
 
-    // --- ExpenseType converters ---
+    // --- ExpenseType <-> String ---
     @TypeConverter
     public static ExpenseType toExpenseType(String value) {
-        return value == null ? null : ExpenseType.valueOf(value);
+        if (value == null) return null;
+        try {
+            return ExpenseType.valueOf(value);
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     @TypeConverter

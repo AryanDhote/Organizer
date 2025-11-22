@@ -1,9 +1,10 @@
 package com.my.organizer.viewmodel;
 
 import android.app.Application;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.my.organizer.database.ExpenseRepository;
 import com.my.organizer.models.Expense;
@@ -12,32 +13,48 @@ import java.util.List;
 
 public class ExpenseViewModel extends AndroidViewModel {
 
-    private ExpenseRepository expenseRepository;
-    private LiveData<List<Expense>> allExpenses;
+    private final ExpenseRepository repository;
+    private final LiveData<List<Expense>> allExpenses;
+    private final LiveData<Double> totalExpenseAmount;
+    private final LiveData<Integer> totalExpenseCount;
 
-    public ExpenseViewModel(Application application) {
+    public ExpenseViewModel(@NonNull Application application) {
         super(application);
-        expenseRepository = new ExpenseRepository(application);
-        allExpenses = expenseRepository.getAllExpenses();
+        repository = new ExpenseRepository(application);
+        allExpenses = repository.getAllExpenses();
+        totalExpenseAmount = repository.getTotalExpenseAmount();
+        totalExpenseCount = repository.getTotalExpenseCount();
     }
 
     public LiveData<List<Expense>> getAllExpenses() {
         return allExpenses;
     }
 
+    public LiveData<Double> getTotalExpenseAmount() {
+        return totalExpenseAmount;
+    }
+
+    public LiveData<Integer> getTotalExpenseCount() {
+        return totalExpenseCount;
+    }
+
+    public LiveData<Expense> getExpenseById(int id) {
+        return repository.getExpenseById(id);
+    }
+
     public void insert(Expense expense) {
-        expenseRepository.insert(expense);
+        repository.insert(expense);
     }
 
     public void update(Expense expense) {
-        expenseRepository.update(expense);
+        repository.update(expense);
     }
 
     public void delete(Expense expense) {
-        expenseRepository.delete(expense);
+        repository.delete(expense);
     }
 
     public void deleteAllExpenses() {
-        expenseRepository.deleteAllExpenses();
+        repository.deleteAllExpenses();
     }
 }
