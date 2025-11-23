@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- ToDo Card -->
+        <!-- ===================== ToDo CARD ===================== -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_todo"
             android:layout_width="match_parent"
@@ -27,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:padding="12dp">
 
+                <!-- Count + Add Button Row -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -36,8 +37,8 @@
                     <TextView
                         android:id="@+id/tv_todo_count"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Total Tasks: 0"
                         android:textSize="18sp"
                         android:textColor="@android:color/black"
@@ -50,10 +51,9 @@
                         android:text="Add ToDo"
                         app:cornerRadius="12dp"
                         app:backgroundTint="@color/colorPrimary" />
-
                 </LinearLayout>
 
-                <!-- Preview list (max 3 items shown) -->
+                <!-- Preview list (max 3 items) -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_todo_preview"
                     android:layout_width="match_parent"
@@ -66,13 +66,13 @@
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Show more" />
+                    android:text="Show more"
+                    android:layout_marginTop="8dp" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Expense Card -->
+        <!-- ===================== EXPENSE CARD ===================== -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_expense"
             android:layout_width="match_parent"
@@ -87,6 +87,7 @@
                 android:layout_height="wrap_content"
                 android:padding="12dp">
 
+                <!-- Total + Add Button Row -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -96,8 +97,8 @@
                     <TextView
                         android:id="@+id/tv_expense_total"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
                         android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:text="Total Expenses: ₹0.00"
                         android:textSize="18sp"
                         android:textColor="@android:color/black"
@@ -110,10 +111,9 @@
                         android:text="Add Expense"
                         app:cornerRadius="12dp"
                         app:backgroundTint="@color/colorPrimary" />
-
                 </LinearLayout>
 
-                <!-- Preview list (max 3 items shown) -->
+                <!-- Preview list (max 3 items) -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_expense_preview"
                     android:layout_width="match_parent"
@@ -121,18 +121,19 @@
                     android:layout_marginTop="8dp"
                     android:nestedScrollingEnabled="false" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_show_expenses"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:text="Show more" />
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Show more for expenses (placed outside card as requested) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_show_expenses"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:text="Show more" />
+
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

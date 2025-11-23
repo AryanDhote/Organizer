@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Add home fragment only once
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // Utility to show a fragment and add to back stack
     private void showFragment(Fragment fragment, String tag) {
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
@@ -42,28 +40,17 @@ public class MainActivity extends AppCompatActivity
                 .commit();
     }
 
-    // ----------------------------
-    // FragmentHome.OnHomeActionListener
-    // ----------------------------
     @Override
-    public void onAddToDo() {
-        startActivity(new Intent(this, AddEditToDoActivity.class));
-    }
+    public void onAddToDo() { startActivity(new Intent(this, AddEditToDoActivity.class)); }
 
     @Override
-    public void onAddExpense() {
-        startActivity(new Intent(this, AddEditExpenseActivity.class));
-    }
+    public void onAddExpense() { startActivity(new Intent(this, AddEditExpenseActivity.class)); }
 
     @Override
-    public void onShowAllToDos() {
-        showFragment(new ToDoListFragment(), "ToDoListFragment");
-    }
+    public void onShowAllToDos() { showFragment(new ToDoListFragment(), "ToDoListFragment"); }
 
     @Override
-    public void onShowAllExpenses() {
-        showFragment(new ExpenseListFragment(), "ExpenseListFragment");
-    }
+    public void onShowAllExpenses() { showFragment(new ExpenseListFragment(), "ExpenseListFragment"); }
 
     @Override
     public void onEditToDo(ToDo toDo) {
@@ -81,41 +68,22 @@ public class MainActivity extends AppCompatActivity
         startActivity(i);
     }
 
-    // ----------------------------
-    // ToDoListFragment.OnToDoListActionListener
-    // ----------------------------
-    // These are the same actions as above; delegate to the same methods
     @Override
-    public void onAddToDoFromList() {
-        onAddToDo();
-    }
+    public void onAddToDoFromList() { onAddToDo(); }
 
     @Override
-    public void onEditToDoFromList(ToDo toDo) {
-        onEditToDo(toDo);
-    }
-
-    // ----------------------------
-    // ExpenseListFragment.OnExpenseListActionListener
-    // ----------------------------
-    @Override
-    public void onAddExpenseFromList() {
-        onAddExpense();
-    }
+    public void onEditToDoFromList(ToDo toDo) { onEditToDo(toDo); }
 
     @Override
-    public void onEditExpenseFromList(Expense expense) {
-        onEditExpense(expense);
-    }
+    public void onAddExpenseFromList() { onAddExpense(); }
 
-    // Back press: pop fragments first
+    @Override
+    public void onEditExpenseFromList(Expense expense) { onEditExpense(expense); }
+
     @Override
     public void onBackPressed() {
         FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStack();
-        } else {
-            super.onBackPressed();
-        }
+        if (fm.getBackStackEntryCount() > 0) fm.popBackStack();
+        else super.onBackPressed();
     }
 }

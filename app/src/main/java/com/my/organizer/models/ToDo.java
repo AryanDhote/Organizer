@@ -8,8 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity(tableName = "todo_table")
-public class ToDo implements Serializable {   // <-- implements Serializable
-
+public class ToDo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @PrimaryKey(autoGenerate = true)
@@ -21,7 +20,7 @@ public class ToDo implements Serializable {   // <-- implements Serializable
     @ColumnInfo(name = "description")
     private String description;
 
-    @ColumnInfo(name = "dueDate")   // matches DAO query
+    @ColumnInfo(name = "dueDate")
     private Date dueDate;
 
     @ColumnInfo(name = "expiryTime")
@@ -34,19 +33,14 @@ public class ToDo implements Serializable {   // <-- implements Serializable
         this.expiryTime = expiryTime;
     }
 
-    // Getters + setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
-
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
-
     public Date getDueDate() { return dueDate; }
     public void setDueDate(Date dueDate) { this.dueDate = dueDate; }
-
     public String getExpiryTime() { return expiryTime; }
     public void setExpiryTime(String expiryTime) { this.expiryTime = expiryTime; }
 }

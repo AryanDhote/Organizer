@@ -32,19 +32,14 @@ public class Expense implements Serializable {
         this.note = note;
     }
 
-    // Getters + setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
     public double getAmount() { return amount; }
     public void setAmount(double amount) { this.amount = amount; }
-
     public Date getDate() { return date; }
     public void setDate(Date date) { this.date = date; }
-
     public ExpenseType getType() { return type; }
     public void setType(ExpenseType type) { this.type = type; }
-
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
 }

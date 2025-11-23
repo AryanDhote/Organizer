@@ -1,52 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_add_edit_expense"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="0dp">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <!-- Main scrolling form -->
+    <ScrollView
+        android:id="@+id/scroll_add_edit_expense"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <EditText
-            android:id="@+id/input_amount"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="Amount" />
+            android:layout_height="wrap_content">
 
-        <Spinner
-            android:id="@+id/spinner_type"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"/>
+            <!-- Header: Title only (delete button moved out as floating) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-        <EditText
-            android:id="@+id/input_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Note"
-            android:layout_marginTop="12dp"/>
+                <TextView
+                    android:id="@+id/text_title_expense"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginBottom="12dp"
+                    android:text="Add Expense"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
-        <TextView
-            android:id="@+id/text_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Select Date"
-            android:padding="12dp"
-            android:background="#EEEEEE"
-            android:layout_marginTop="12dp" />
+                <!-- keep an invisible spacer where delete used to be so layout doesn't jump -->
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:visibility="invisible" />
+            </LinearLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_save"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save Expense"
-            android:layout_marginTop="20dp"
-            app:cornerRadius="12dp" />
+            <!-- Amount -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_amount"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:boxBackgroundMode="outline"
+                android:hint="Amount">
 
-    </LinearLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_amount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:imeOptions="actionNext"
+                    android:hint="Amount:0.00" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-</ScrollView>
+            <!-- Expense Type / Category spinner -->
+            <TextView
+                android:id="@+id/label_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:layout_marginTop="12dp" />
+
+            <Spinner
+                android:id="@+id/spinner_type"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="4dp"
+                android:spinnerMode="dropdown"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+
+            <!-- Date -->
+            <TextView
+                android:id="@+id/label_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/text_date"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="Tap to select date"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:layout_marginTop="4dp" />
+
+            <!-- Note / Description -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_note"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxStrokeColor="?attr/colorPrimary"
+                app:boxBackgroundMode="outline"
+                android:hint="Note "
+                android:layout_marginTop="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:minLines="2"
+                    android:maxLines="4"
+                    android:hint="Note (Optional)"
+                    android:imeOptions="flagNoEnterAction" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Spacer to ensure FAB doesn't overlap the Save button (optional) -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:visibility="gone"
+                android:id="@+id/spacer_for_fab" />
+
+            <!-- Save button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:layout_marginTop="18dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Icon-only circular delete button (MaterialButton) top-right floating -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_delete"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:contentDescription="@string/delete"
+        app:icon="@drawable/ic_delete"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="@color/red"
+        app:cornerRadius="24dp"
+        app:strokeWidth="0dp"
+        app:useMaterialThemeColors="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:padding="0dp"
+        android:elevation="6dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,44 +13,28 @@ public class ExpenseRepository {
     private final LiveData<List<Expense>> allExpenses;
     private final LiveData<Double> totalExpenseAmount;
     private final LiveData<Integer> totalExpenseCount;
+    private final AppDatabase db;
 
     public ExpenseRepository(Application application) {
-        AppDatabase db = AppDatabase.getInstance(application);
+        db = AppDatabase.getInstance(application);
         expenseDao = db.expenseDao();
         allExpenses = expenseDao.getAllExpenses();
         totalExpenseAmount = expenseDao.getTotalExpenseAmount();
         totalExpenseCount = expenseDao.getTotalExpenseCount();
     }
 
-    public LiveData<List<Expense>> getAllExpenses() {
-        return allExpenses;
-    }
+    public LiveData<List<Expense>> getAllExpenses() { return allExpenses; }
+    public LiveData<Double> getTotalExpenseAmount() { return totalExpenseAmount; }
+    public LiveData<Integer> getTotalExpenseCount() { return totalExpenseCount; }
+    public LiveData<Expense> getExpenseById(int id) { return expenseDao.getExpenseById(id); }
 
-    public LiveData<Double> getTotalExpenseAmount() {
-        return totalExpenseAmount;
-    }
+    public void insert(Expense expense) { AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.insert(expense)); }
+    public void update(Expense expense) { AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.update(expense)); }
+    public void delete(Expense expense) { AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.delete(expense)); }
+    public void deleteAllExpenses() { AppDatabase.databaseWriteExecutor.execute(expenseDao::deleteAllExpenses); }
 
-    public LiveData<Integer> getTotalExpenseCount() {
-        return totalExpenseCount;
-    }
-
-    public LiveData<Expense> getExpenseById(int id) {
-        return expenseDao.getExpenseById(id);
-    }
-
-    public void insert(Expense expense) {
-        AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.insert(expense));
-    }
-
-    public void update(Expense expense) {
-        AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.update(expense));
-    }
-
-    public void delete(Expense expense) {
-        AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.delete(expense));
-    }
-
-    public void deleteAllExpenses() {
-        AppDatabase.databaseWriteExecutor.execute(expenseDao::deleteAllExpenses);
+    public void deleteByIds(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) return;
+        AppDatabase.databaseWriteExecutor.execute(() -> expenseDao.deleteByIds(ids));
     }
 }

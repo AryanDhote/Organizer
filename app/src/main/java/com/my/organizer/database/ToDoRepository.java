@@ -12,43 +12,27 @@ public class ToDoRepository {
     private final ToDoDao toDoDao;
     private final LiveData<List<ToDo>> allToDos;
     private final LiveData<Integer> totalToDoCount;
+    private final AppDatabase db;
 
     public ToDoRepository(Application application) {
-        AppDatabase db = AppDatabase.getInstance(application);
+        db = AppDatabase.getInstance(application);
         toDoDao = db.toDoDao();
         allToDos = toDoDao.getAllToDos();
         totalToDoCount = toDoDao.getTotalToDoCount();
     }
 
-    public LiveData<List<ToDo>> getAllToDos() {
-        return allToDos;
-    }
+    public LiveData<List<ToDo>> getAllToDos() { return allToDos; }
+    public LiveData<Integer> getTotalToDoCount() { return totalToDoCount; }
+    public LiveData<ToDo> getToDoById(int id) { return toDoDao.getToDoById(id); }
+    public LiveData<List<ToDo>> getExpiredToDos(long currentTimeMillis) { return toDoDao.getExpiredToDos(currentTimeMillis); }
 
-    public LiveData<Integer> getTotalToDoCount() {
-        return totalToDoCount;
-    }
+    public void insert(ToDo todo) { AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.insert(todo)); }
+    public void update(ToDo todo) { AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.update(todo)); }
+    public void delete(ToDo todo) { AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.delete(todo)); }
+    public void deleteAllToDos() { AppDatabase.databaseWriteExecutor.execute(toDoDao::deleteAllToDos); }
 
-    public LiveData<ToDo> getToDoById(int id) {
-        return toDoDao.getToDoById(id);
-    }
-
-    public LiveData<List<ToDo>> getExpiredToDos(long currentTimeMillis) {
-        return toDoDao.getExpiredToDos(currentTimeMillis);
-    }
-
-    public void insert(ToDo todo) {
-        AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.insert(todo));
-    }
-
-    public void update(ToDo todo) {
-        AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.update(todo));
-    }
-
-    public void delete(ToDo todo) {
-        AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.delete(todo));
-    }
-
-    public void deleteAllToDos() {
-        AppDatabase.databaseWriteExecutor.execute(toDoDao::deleteAllToDos);
+    public void deleteByIds(List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) return;
+        AppDatabase.databaseWriteExecutor.execute(() -> toDoDao.deleteByIds(ids));
     }
 }

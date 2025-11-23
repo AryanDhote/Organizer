@@ -1,42 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_margin="6dp" android:elevation="4dp" android:padding="10dp">
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_expense_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="10dp">
 
-    <LinearLayout android:orientation="vertical" android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tv_amount"
+        <!-- CHECKBOX -->
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/selection_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="₹100.00"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            app:buttonTint="?attr/colorPrimary" />
 
+        <!-- TITLE -->
         <TextView
-            android:id="@+id/tv_type"
+            android:id="@+id/tv_expense_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lunch at Cafe"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_toEndOf="@id/selection_checkbox"
+            android:layout_marginStart="8dp" />
+
+        <!-- DATE -->
+        <TextView
+            android:id="@+id/tv_expense_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="05 Feb 2026"
+            android:layout_alignParentEnd="true"
+            android:textAppearance="?attr/textAppearanceCaption" />
+
+        <!-- CATEGORY (NO ICON) -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/tv_expense_category"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Food"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/white"
+            app:chipBackgroundColor="@color/colorPrimary"
+            android:layout_below="@id/tv_expense_title"
+            android:layout_marginTop="8dp" />
 
+        <!-- AMOUNT -->
         <TextView
-            android:id="@+id/tv_note"
+            android:id="@+id/tv_expense_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Note"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:text="₹450"
+            android:textStyle="bold"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tv_expense_title"
+            android:layout_marginTop="8dp" />
 
+        <!-- DESCRIPTION -->
         <TextView
-            android:id="@+id/tv_date"
+            android:id="@+id/tv_expense_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_expense_category"
+            android:layout_marginTop="8dp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:text="Expense description..." />
+
+
+        <!-- DELETE BUTTON (VISIBLE IN EDIT MODE ONLY) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12 Feb 2025"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray" />
+            android:text="Delete"
+            android:visibility="gone"
+            app:backgroundTint="@color/red"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/tv_expense_description"
+            android:layout_marginTop="6dp" />
 
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+        <!-- SELECTION OVERLAY -->
+        <FrameLayout
+            android:id="@+id/selection_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#22000000" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/selection_checkbox_overlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                app:buttonTint="?attr/colorPrimary"
+                android:layout_marginStart="8dp"
+                android:layout_gravity="start|center_vertical" />
+        </FrameLayout>
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -37,4 +37,7 @@ public interface ExpenseDao {
 
     @Query("DELETE FROM expense_table")
     void deleteAllExpenses();
+
+    @Query("DELETE FROM expense_table WHERE id IN (:ids)")
+    void deleteByIds(List<Integer> ids);
 }

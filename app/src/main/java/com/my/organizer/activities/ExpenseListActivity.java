@@ -29,13 +29,11 @@ public class ExpenseListActivity extends AppCompatActivity {
         adapter = new ExpenseAdapter();
         rv.setAdapter(adapter);
 
-        adapter.setOnExpenseClickListener(new ExpenseAdapter.OnExpenseClickListener() {
-            @Override
-            public void onExpenseClick(Expense expense) {
-                Intent i = new Intent(ExpenseListActivity.this, AddEditExpenseActivity.class);
-                i.putExtra(AddEditExpenseActivity.EXTRA_EXPENSE, expense);
-                startActivity(i);
-            }
+        // Use the corrected interface name
+        adapter.setOnExpenseClickListener(expense -> {
+            Intent i = new Intent(ExpenseListActivity.this, AddEditExpenseActivity.class);
+            i.putExtra(AddEditExpenseActivity.EXTRA_EXPENSE, expense);
+            startActivity(i);
         });
 
         expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);

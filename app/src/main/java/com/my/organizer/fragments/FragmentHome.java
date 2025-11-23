@@ -50,13 +50,12 @@ public class FragmentHome extends Fragment {
         void onShowAllToDos();
         void onShowAllExpenses();
 
-        // Optional: edit callbacks when user taps a preview item
         void onEditToDo(ToDo toDo);
         void onEditExpense(Expense expense);
     }
     private OnHomeActionListener listener;
 
-    public FragmentHome() { /* required empty constructor */ }
+    public FragmentHome() { }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -83,24 +82,26 @@ public class FragmentHome extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        // bind views (IDs must match your fragment_home.xml)
         tvTodoCount = view.findViewById(R.id.tv_todo_count);
         tvExpenseTotal = view.findViewById(R.id.tv_expense_total);
 
         btnAddTodo = view.findViewById(R.id.btn_add_todo);
         btnAddExpense = view.findViewById(R.id.btn_add_expense);
         btnShowTodos = view.findViewById(R.id.btn_show_todos);
-        // note: in your layout btn_show_expenses is outside the expense card
         btnShowExpenses = view.findViewById(R.id.btn_show_expenses);
 
         rvTodoPreview = view.findViewById(R.id.rv_todo_preview);
         rvExpensePreview = view.findViewById(R.id.rv_expense_preview);
 
-        // prepare adapters
         toDoAdapter = new ToDoAdapter(requireContext());
         expenseAdapter = new ExpenseAdapter();
 
-        // enable preview item edit clicks — delegate to host via listener
+        // Home preview: disable selection and overflow. Taps open edit.
+        toDoAdapter.setSelectionEnabled(false);
+        toDoAdapter.setShowOverflow(false);
+        expenseAdapter.setSelectionEnabled(false);
+        expenseAdapter.setShowOverflow(false);
+
         toDoAdapter.setOnToDoClickListener(toDo -> {
             if (listener != null) listener.onEditToDo(toDo);
         });
@@ -114,12 +115,10 @@ public class FragmentHome extends Fragment {
         rvExpensePreview.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvExpensePreview.setAdapter(expenseAdapter);
 
-        // viewmodels
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
-        expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);
+        homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+        toDoViewModel = new ViewModelProvider(requireActivity()).get(ToDoViewModel.class);
+        expenseViewModel = new ViewModelProvider(requireActivity()).get(ExpenseViewModel.class);
 
-        // observe summary values (update small labels)
         homeViewModel.getTotalToDoCount().observe(getViewLifecycleOwner(), count -> {
             int c = (count == null) ? 0 : count;
             tvTodoCount.setText("Total Tasks: " + c);
@@ -130,36 +129,29 @@ public class FragmentHome extends Fragment {
             tvExpenseTotal.setText(String.format("Total Expenses: ₹%.2f", a));
         });
 
-        // observe preview lists and show up to 3 items
+        // previews (limit to 3)
         toDoViewModel.getAllToDos().observe(getViewLifecycleOwner(), toDos -> {
             List<ToDo> preview = takePreview(toDos, 3);
             toDoAdapter.setToDoList(preview);
+            // ensure selection cleared and preview is read-only
+            toDoAdapter.clearSelection();
+            toDoAdapter.setSelectionEnabled(false);
         });
 
         expenseViewModel.getAllExpenses().observe(getViewLifecycleOwner(), expenses -> {
             List<Expense> preview = takePreview(expenses, 3);
             expenseAdapter.setExpenseList(preview);
+            expenseAdapter.clearSelection();
+            expenseAdapter.setSelectionEnabled(false);
         });
 
-        // button hooks — delegate actions to host activity
-        btnAddTodo.setOnClickListener(v -> {
-            if (listener != null) listener.onAddToDo();
-        });
+        btnAddTodo.setOnClickListener(v -> { if (listener != null) listener.onAddToDo(); });
+        btnAddExpense.setOnClickListener(v -> { if (listener != null) listener.onAddExpense(); });
 
-        btnAddExpense.setOnClickListener(v -> {
-            if (listener != null) listener.onAddExpense();
-        });
-
-        btnShowTodos.setOnClickListener(v -> {
-            if (listener != null) listener.onShowAllToDos();
-        });
-
-        btnShowExpenses.setOnClickListener(v -> {
-            if (listener != null) listener.onShowAllExpenses();
-        });
+        btnShowTodos.setOnClickListener(v -> { if (listener != null) listener.onShowAllToDos(); });
+        btnShowExpenses.setOnClickListener(v -> { if (listener != null) listener.onShowAllExpenses(); });
     }
 
-    // helper: limit list to 'limit' items (returns empty list if null)
     private <T> List<T> takePreview(List<T> list, int limit) {
         if (list == null) return new ArrayList<>();
         if (list.size() <= limit) return list;

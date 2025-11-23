@@ -1,37 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_add_edit_todo"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <LinearLayout android:orientation="vertical" android:padding="16dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content">
+    <!-- Main scrolling form -->
+    <ScrollView
+        android:id="@+id/scroll_add_edit_todo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <EditText
-            android:id="@+id/input_todo_title"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Title" />
+            android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/input_todo_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description"
-            android:layout_marginTop="8dp"/>
+            <!-- Header: Title only (delete button is floating) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/text_todo_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Select Due Date"
-            android:padding="12dp"
-            android:background="#EEEEEE"
-            android:layout_marginTop="8dp"/>
+                <TextView
+                    android:id="@+id/text_title_todo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add ToDo"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+                    android:layout_marginBottom="12dp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_save_todo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save ToDo"
-            android:layout_marginTop="16dp"/>
-    </LinearLayout>
-</ScrollView>
+                <!-- invisible spacer so layout doesn't jump when FAB appears -->
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+            <!-- ToDo Title -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_todo_title"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Title">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_todo_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:imeOptions="actionNext" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Description -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_todo_description"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Description (optional)"
+                android:layout_marginTop="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_todo_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:minLines="2"
+                    android:maxLines="4"
+                    android:imeOptions="flagNoEnterAction" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Due Date -->
+            <TextView
+                android:id="@+id/label_due_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Due Date"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/text_todo_date"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="Tap to select due date"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:layout_marginTop="4dp" />
+
+            <!-- Optional expiry time -->
+            <TextView
+                android:id="@+id/label_expiry_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Expiry Time (optional)"
+                android:textAppearance="?attr/textAppearanceCaption"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/text_todo_expiry_time"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:text="Tap to select time"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:layout_marginTop="4dp" />
+
+            <!-- Spacer so FAB won't overlap Save -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:visibility="gone"
+                android:id="@+id/spacer_for_fab_todo" />
+
+            <!-- Save button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save_todo"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:layout_marginTop="18dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Icon-only circular delete button (MaterialButton) top-right floating -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_delete"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:contentDescription="Delete"
+        app:icon="@drawable/ic_delete"
+        app:iconTint="@android:color/white"
+        app:backgroundTint="@color/red"
+        app:cornerRadius="24dp"
+        app:strokeWidth="0dp"
+        app:useMaterialThemeColors="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
+        android:padding="0dp"
+        android:elevation="6dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

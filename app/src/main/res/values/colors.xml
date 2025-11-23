@@ -14,6 +14,7 @@
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorSurface">#FFFFFF</color>
 
+
     <!-- Error colors -->
     <color name="colorError">#B00020</color>
     <color name="colorOnError">#FFFFFF</color>
@@ -25,4 +26,8 @@
     <!-- Other colors (Optional) -->
     <color name="colorAccent">#FF4081</color>
     <color name="colorTextPrimary">#212121</color>
+
+
+    <!-- selection overlay used by item layouts (alpha applied in layout) -->
+    <color name="selection_overlay">#000000</color>
 </resources>

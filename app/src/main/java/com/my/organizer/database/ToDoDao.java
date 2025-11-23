@@ -37,4 +37,7 @@ public interface ToDoDao {
 
     @Query("DELETE FROM todo_table")
     void deleteAllToDos();
+
+    @Query("DELETE FROM todo_table WHERE id IN (:ids)")
+    void deleteByIds(List<Integer> ids);
 }
