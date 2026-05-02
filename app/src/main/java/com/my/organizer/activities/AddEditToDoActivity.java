@@ -3,12 +3,15 @@ package com.my.organizer.activities;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,8 +21,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.my.organizer.R;
 import com.my.organizer.models.ToDo;
 import com.my.organizer.viewmodel.ToDoViewModel;
-
-import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -48,6 +49,9 @@ public class AddEditToDoActivity extends AppCompatActivity {
         textExpiryTime = findViewById(R.id.text_todo_expiry_time);
         btnSave = findViewById(R.id.btn_save_todo);
         btnDelete = findViewById(R.id.btn_delete);
+
+        // Defensive tinting so the delete button looks identical in light & dark modes
+        applyDeleteButtonTint();
 
         toDoViewModel = new ViewModelProvider(this).get(ToDoViewModel.class);
 
@@ -78,10 +82,6 @@ public class AddEditToDoActivity extends AppCompatActivity {
 
         textDueDate.setOnClickListener(v -> showDatePicker());
 
-        textExpiryTime.setOnClickListener(v -> {
-            // optional: implement time picker later
-        });
-
         btnSave.setOnClickListener(v -> {
             String title = inputTitle.getText() == null ? "" : inputTitle.getText().toString().trim();
             String desc = inputDescription.getText() == null ? "" : inputDescription.getText().toString().trim();
@@ -106,7 +106,6 @@ public class AddEditToDoActivity extends AppCompatActivity {
 
         btnDelete.setOnClickListener(v -> {
             if (editingToDo == null) return;
-
             new AlertDialog.Builder(this)
                     .setTitle("Delete")
                     .setMessage("Delete this ToDo?")
@@ -114,6 +113,16 @@ public class AddEditToDoActivity extends AppCompatActivity {
                     .setNegativeButton("Cancel", null)
                     .show();
         });
+    }
+
+    private void applyDeleteButtonTint() {
+        if (btnDelete == null) return;
+        int redColor = ContextCompat.getColor(this, R.color.red);
+        btnDelete.setBackgroundTintList(ColorStateList.valueOf(redColor));
+        btnDelete.setIconTint(ColorStateList.valueOf(
+                ContextCompat.getColor(this, android.R.color.white)
+        ));
+        btnDelete.setStrokeWidth(0);
     }
 
     private void showDatePicker() {
@@ -127,35 +136,25 @@ public class AddEditToDoActivity extends AppCompatActivity {
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    /**
-     * Delete with UNDO: disables delete button, deletes via ViewModel, shows Snackbar with UNDO that reinserts.
-     * Finishes the activity so user returns to the list while Snackbar remains visible there.
-     */
     private void performDeleteWithUndo(ToDo toDelete) {
         if (toDelete == null) return;
 
-        // prevent double taps
+        // prevent repeated taps
         btnDelete.setEnabled(false);
 
-        // delete
+        // delete from DB (repository uses background executor)
         toDoViewModel.delete(toDelete);
 
-        // show Snackbar with UNDO
         View root = findViewById(android.R.id.content);
         Snackbar.make(root, "ToDo deleted", Snackbar.LENGTH_LONG)
-                .setAction("UNDO", v -> {
-                    toDoViewModel.insert(toDelete);
-                })
+                .setAction("UNDO", v -> toDoViewModel.insert(toDelete))
                 .addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
-                        // defensive: re-enable delete if user returns here (we normally finish)
                         btnDelete.setEnabled(true);
                     }
-                })
-                .show();
+                }).show();
 
-        // finish activity immediately (UNDO still works)
         finish();
     }
 }

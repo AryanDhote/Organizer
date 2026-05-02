@@ -8,50 +8,32 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="4dp"
     app:cardUseCompatPadding="true"
-    android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:padding="12dp">
+    android:focusable="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!-- OPTIONAL PRIORITY CHIP -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_priority"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="High"
-            app:chipCornerRadius="8dp"
-            app:chipBackgroundColor="@color/red"
-            android:textColor="@android:color/white"
-            android:visibility="gone"
-            android:layout_alignParentStart="true" />
+        android:layout_height="wrap_content"
+        android:padding="12dp">
 
         <!-- TITLE -->
         <TextView
             android:id="@+id/tv_todo_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buy Groceries"
+            android:text="Buy groceries"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:layout_toEndOf="@id/chip_priority"
-            android:layout_marginStart="8dp"
-            android:layout_alignParentTop="true" />
+            android:textColor="@android:color/black" />
 
-        <!-- DUE DATE -->
+        <!-- DATE -->
         <TextView
             android:id="@+id/tv_todo_due_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="01 Jan 2026"
-            android:textAppearance="?attr/textAppearanceCaption"
             android:layout_alignParentEnd="true"
-            android:layout_alignTop="@id/tv_todo_title" />
+            android:text="05 Feb 2026"
+            android:textAppearance="?attr/textAppearanceCaption" />
 
         <!-- DESCRIPTION -->
         <TextView
@@ -60,49 +42,45 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_todo_title"
             android:layout_marginTop="6dp"
-            android:text="Summary of the task goes here... up to 3 lines."
             android:maxLines="3"
-            android:ellipsize="end" />
+            android:ellipsize="end"
+            android:text="Buy milk, vegetables and fruits" />
 
-        <!-- EXPIRY TIME -->
+        <!-- TIME -->
         <TextView
             android:id="@+id/tv_todo_expiry_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="09:00 AM"
             android:layout_below="@id/tv_todo_description"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceCaption" />
+            android:layout_marginTop="6dp"
+            android:text="10:30 AM"
+            android:textStyle="bold" />
 
-        <!-- MULTI-SELECT OVERLAY -->
+        <!-- SELECTION OVERLAY -->
         <FrameLayout
             android:id="@+id/selection_overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:clickable="false">
 
+            <!-- dim background -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/selection_overlay"
-                android:alpha="0.35" />
+                android:background="#22000000" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                android:layout_gravity="end|top">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_check"
-                    android:layout_gravity="center"
-                    app:tint="@android:color/white" />
-            </com.google.android.material.card.MaterialCardView>
-
+            <!-- checkbox -->
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/selection_checkbox_overlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="12dp"
+                android:checked="true"
+                app:buttonTint="?attr/colorPrimary" />
         </FrameLayout>
 
     </RelativeLayout>
+
 </com.google.android.material.card.MaterialCardView>

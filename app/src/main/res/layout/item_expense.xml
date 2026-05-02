@@ -1,97 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_expense_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="10dp"
-    app:cardElevation="4dp"
-    app:cardUseCompatPadding="true"
-    android:clickable="true"
-    android:focusable="true"
-    android:padding="10dp">
+    app:cardElevation="4dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!-- CHECKBOX -->
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/selection_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_centerVertical="true"
-            app:buttonTint="?attr/colorPrimary" />
+        android:layout_height="wrap_content"
+        android:padding="12dp">
 
         <!-- TITLE -->
         <TextView
             android:id="@+id/tv_expense_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lunch at Cafe"
-            android:textSize="18sp"
+            android:text="Expense"
             android:textStyle="bold"
-            android:layout_toEndOf="@id/selection_checkbox"
-            android:layout_marginStart="8dp" />
+            android:textSize="16sp"/>
 
-        <!-- DATE -->
+        <!-- AMOUNT ROW + CHECKBOX BEFORE AMOUNT -->
+        <LinearLayout
+            android:id="@+id/amount_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_expense_title"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/selection_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/tv_expense_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹0.00"
+                android:textStyle="bold"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tv_expense_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="05 Feb 2026"
-            android:layout_alignParentEnd="true"
-            android:textAppearance="?attr/textAppearanceCaption" />
+            android:layout_below="@id/amount_row"
+            android:layout_marginTop="4dp"
+            android:text="Date"/>
 
-        <!-- CATEGORY (NO ICON) -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/tv_expense_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Food"
-            android:textColor="@android:color/white"
-            app:chipBackgroundColor="@color/colorPrimary"
-            android:layout_below="@id/tv_expense_title"
-            android:layout_marginTop="8dp" />
-
-        <!-- AMOUNT -->
-        <TextView
-            android:id="@+id/tv_expense_amount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="₹450"
-            android:textStyle="bold"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/tv_expense_title"
-            android:layout_marginTop="8dp" />
-
-        <!-- DESCRIPTION -->
         <TextView
             android:id="@+id/tv_expense_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_expense_category"
-            android:layout_marginTop="8dp"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:text="Expense description..." />
+            android:layout_below="@id/tv_expense_date"
+            android:layout_marginTop="4dp"
+            android:text="Description"/>
 
-
-        <!-- DELETE BUTTON (VISIBLE IN EDIT MODE ONLY) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_delete_item"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete"
-            android:visibility="gone"
-            app:backgroundTint="@color/red"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@id/tv_expense_description"
-            android:layout_marginTop="6dp" />
-
-        <!-- SELECTION OVERLAY -->
+        <!-- OVERLAY -->
         <FrameLayout
             android:id="@+id/selection_overlay"
             android:layout_width="match_parent"
@@ -101,17 +72,9 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#22000000" />
-
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/selection_checkbox_overlay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                app:buttonTint="?attr/colorPrimary"
-                android:layout_marginStart="8dp"
-                android:layout_gravity="start|center_vertical" />
+                android:background="#22000000"/>
         </FrameLayout>
 
     </RelativeLayout>
+
 </com.google.android.material.card.MaterialCardView>

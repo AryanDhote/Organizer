@@ -3,6 +3,7 @@ package com.my.organizer.activities;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -54,6 +56,9 @@ public class AddEditExpenseActivity extends AppCompatActivity {
         textDate = findViewById(R.id.text_date);
         btnSave = findViewById(R.id.btn_save);
         btnDelete = findViewById(R.id.btn_delete);
+
+        // Defensive tinting so the delete button looks identical in light & dark modes
+        applyDeleteButtonTint();
 
         expenseViewModel = new ViewModelProvider(this).get(ExpenseViewModel.class);
 
@@ -129,6 +134,17 @@ public class AddEditExpenseActivity extends AppCompatActivity {
         });
     }
 
+    private void applyDeleteButtonTint() {
+        if (btnDelete == null) return;
+        int redColor = ContextCompat.getColor(this, R.color.red);
+        btnDelete.setBackgroundTintList(ColorStateList.valueOf(redColor));
+        btnDelete.setIconTint(ColorStateList.valueOf(
+                ContextCompat.getColor(this, android.R.color.white)
+        ));
+        // ensure no stroke
+        btnDelete.setStrokeWidth(0);
+    }
+
     private void showDatePicker() {
         Calendar c = Calendar.getInstance();
         c.setTime(selectedDate != null ? selectedDate : new Date());
@@ -163,8 +179,6 @@ public class AddEditExpenseActivity extends AppCompatActivity {
                 .addCallback(new Snackbar.Callback() {
                     @Override
                     public void onDismissed(Snackbar transientBottomBar, int event) {
-                        // re-enable delete button if user navigates back to this screen without finishing
-                        // (in our flow we finish immediately, but this is defensive)
                         btnDelete.setEnabled(true);
                     }
                 })

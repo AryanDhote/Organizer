@@ -11,30 +11,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.my.organizer.R;
 import com.my.organizer.models.Expense;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
-/**
- * Defensive ExpenseAdapter:
- * - Guards optional views (btn_more, chips, overlay checkbox) before using them.
- * - Supports multi-select via selectedIds set.
- * - Keeps same external API: setExpenseList(), setOnExpenseClickListener(), setOnExpenseLongClickListener().
- */
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.VH> {
 
+    // ---------------- INTERFACES ----------------
     public interface OnExpenseClickListener { void onExpenseClick(Expense e); }
     public interface OnExpenseLongClickListener { void onExpenseLongClick(Expense e); }
-    public interface OnExpenseActionListener { void onEditExpense(Expense e); void onDeleteExpense(Expense e); }
+    public interface OnExpenseActionListener {
+        void onEditExpense(Expense e);
+        void onDeleteExpense(Expense e);
+    }
 
     private final List<Expense> items = new ArrayList<>();
     private final Set<Integer> selectedIds = new HashSet<>();
@@ -43,26 +35,19 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.VH> {
     private OnExpenseLongClickListener longClickListener;
     private OnExpenseActionListener actionListener;
 
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-    private boolean selectionEnabled = true;
+    private final SimpleDateFormat dateFormat =
+            new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+
+    private boolean selectionMode = false;
     private boolean showOverflow = true;
 
-    public ExpenseAdapter() {}
-
-    public void setExpenseList(List<Expense> list) {
-        items.clear();
-        if (list != null) items.addAll(list);
-        selectedIds.retainAll(getAllIds());
-        notifyDataSetChanged();
-    }
-
-    public void setOnExpenseClickListener(OnExpenseClickListener l) { this.clickListener = l; }
-    public void setOnExpenseLongClickListener(OnExpenseLongClickListener l) { this.longClickListener = l; }
-    public void setOnExpenseActionListener(OnExpenseActionListener l) { this.actionListener = l; }
+    // ---------------- REQUIRED METHODS (FIX FOR YOUR ERRORS) ----------------
 
     public void setSelectionEnabled(boolean enabled) {
-        this.selectionEnabled = enabled;
-        if (!enabled) clearSelection();
+        this.selectionMode = false;
+        if (!enabled) {
+            selectedIds.clear();
+        }
         notifyDataSetChanged();
     }
 
@@ -71,187 +56,165 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.VH> {
         notifyDataSetChanged();
     }
 
+    public void clearSelection() {
+        selectedIds.clear();
+        selectionMode = false;
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedCount() {
+        return selectedIds.size();
+    }
+
+    public Expense getItemAt(int position) {
+        if (position >= 0 && position < items.size()) {
+            return items.get(position);
+        }
+        return null;
+    }
+
+    public List<Expense> getSelectedItems() {
+        List<Expense> list = new ArrayList<>();
+        for (Expense e : items) {
+            if (selectedIds.contains(e.getId())) {
+                list.add(e);
+            }
+        }
+        return list;
+    }
+
+    // IMPORTANT: must be PUBLIC (your error)
+    public void toggleSelection(Expense e) {
+        int id = e.getId();
+        if (selectedIds.contains(id)) selectedIds.remove(id);
+        else selectedIds.add(id);
+    }
+
+    // ---------------- DATA ----------------
+
+    public void setExpenseList(List<Expense> list) {
+        items.clear();
+        if (list != null) items.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    public void setOnExpenseClickListener(OnExpenseClickListener l) { clickListener = l; }
+    public void setOnExpenseLongClickListener(OnExpenseLongClickListener l) { longClickListener = l; }
+    public void setOnExpenseActionListener(OnExpenseActionListener l) { actionListener = l; }
+
+    // ---------------- VIEW HOLDER ----------------
+
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_expense, parent, false);
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_expense, parent, false);
         return new VH(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
+
         Expense e = items.get(position);
+        boolean selected = selectedIds.contains(e.getId());
 
-        // Title (note) / amount / date / category
-        holder.title.setText(e.getNote() == null || e.getNote().isEmpty() ? "Expense" : e.getNote());
+        holder.title.setText(e.getNote() == null ? "Expense" : e.getNote());
         holder.amount.setText(String.format(Locale.getDefault(), "₹%.2f", e.getAmount()));
+        holder.date.setText(e.getDate() == null ? "" : dateFormat.format(e.getDate()));
+        holder.description.setText(e.getNote() == null ? "" : e.getNote());
 
-        Date d = e.getDate();
-        holder.date.setText(d == null ? "" : dateFormat.format(d));
-
-        // Category chip (if present)
-        if (holder.categoryChip != null) {
-            String cat = e.getType() == null ? "Other" : e.getType().name();
-            holder.categoryChip.setText(cat);
-            holder.categoryChip.setVisibility(View.VISIBLE);
-        }
-
-        // Description text (if present)
-        if (holder.description != null) {
-            holder.description.setText(e.getNote() == null ? "" : e.getNote());
-            holder.description.setMaxLines(3);
-        }
-
-        // Overflow button may be absent in layout — guard it
-        if (holder.btnMore != null) {
-            holder.btnMore.setVisibility(showOverflow ? View.VISIBLE : View.GONE);
-        }
-
-        // Selection visuals
-        boolean selected = selectedIds.contains(getId(e));
-        if (selectionEnabled) {
-            if (holder.selectionOverlay != null) holder.selectionOverlay.setVisibility(selected ? View.VISIBLE : View.GONE);
-            if (holder.selectionCheckbox != null) holder.selectionCheckbox.setChecked(selected);
+        // ---------------- CHECKBOX LOGIC ----------------
+        if (selectionMode) {
+            holder.checkbox.setVisibility(View.VISIBLE);
+            holder.checkbox.setChecked(selected);
         } else {
-            if (holder.selectionOverlay != null) holder.selectionOverlay.setVisibility(View.GONE);
-            if (holder.selectionCheckbox != null) holder.selectionCheckbox.setChecked(false);
+            holder.checkbox.setVisibility(View.GONE);
         }
 
-        // Click handling
+        holder.overlay.setVisibility(selected ? View.VISIBLE : View.GONE);
+
+        // ---------------- CLICK ----------------
         holder.itemView.setOnClickListener(v -> {
-            if (selectionEnabled && !selectedIds.isEmpty()) {
+
+            if (selectionMode) {
                 toggleSelection(e);
-                if (longClickListener != null) longClickListener.onExpenseLongClick(e);
+                notifyDataSetChanged();
+
+                if (selectedIds.isEmpty()) {
+                    selectionMode = false;
+                }
+
+                notifyDataSetChanged();
+
             } else {
-                if (clickListener != null) clickListener.onExpenseClick(e);
+                if (clickListener != null)
+                    clickListener.onExpenseClick(e);
             }
         });
 
+        // ---------------- LONG PRESS ----------------
         holder.itemView.setOnLongClickListener(v -> {
-            if (!selectionEnabled) return false;
-            if (longClickListener != null) {
+            selectionMode = true;
+            toggleSelection(e);
+            notifyDataSetChanged();
+
+            if (longClickListener != null)
                 longClickListener.onExpenseLongClick(e);
-                toggleSelection(e);
-                return true;
-            } else {
-                toggleSelection(e);
-                return true;
-            }
+
+            return true;
         });
 
-        // Overflow popup (if present)
-        if (holder.btnMore != null) {
-            holder.btnMore.setOnClickListener(v -> {
-                PopupMenu popup = new PopupMenu(holder.btnMore.getContext(), holder.btnMore);
-                popup.getMenu().add(0, 0, 0, "Edit");
-                popup.getMenu().add(0, 1, 1, "Delete");
-                popup.setOnMenuItemClickListener((MenuItem item1) -> {
+        // ---------------- MENU ----------------
+        if (holder.more != null) {
+            holder.more.setVisibility(showOverflow ? View.VISIBLE : View.GONE);
+
+            holder.more.setOnClickListener(v -> {
+                PopupMenu menu = new PopupMenu(holder.more.getContext(), holder.more);
+                menu.getMenu().add("Edit");
+                menu.getMenu().add("Delete");
+
+                menu.setOnMenuItemClickListener(item -> {
                     if (actionListener == null) return false;
-                    if (item1.getItemId() == 0) {
+
+                    if (item.getTitle().equals("Edit")) {
                         actionListener.onEditExpense(e);
                         return true;
-                    } else if (item1.getItemId() == 1) {
+                    } else {
                         actionListener.onDeleteExpense(e);
                         return true;
                     }
-                    return false;
                 });
-                popup.show();
+
+                menu.show();
             });
         }
     }
 
     @Override
-    public int getItemCount() { return items.size(); }
-
-    // selection helpers
-    public void toggleSelection(Expense e) {
-        int id = getId(e);
-        if (selectedIds.contains(id)) selectedIds.remove(id);
-        else selectedIds.add(id);
-        int idx = indexOfId(id);
-        if (idx != -1) notifyItemChanged(idx);
+    public int getItemCount() {
+        return items.size();
     }
 
-    public List<Expense> getSelectedItems() {
-        List<Expense> sel = new ArrayList<>();
-        for (Expense e : items) {
-            if (selectedIds.contains(getId(e))) sel.add(e);
-        }
-        return sel;
-    }
-
-    public int getSelectedCount() { return selectedIds.size(); }
-
-    public void clearSelection() {
-        if (selectedIds.isEmpty()) return;
-        List<Integer> copy = new ArrayList<>(selectedIds);
-        selectedIds.clear();
-        for (Integer id : copy) {
-            int idx = indexOfId(id);
-            if (idx != -1) notifyItemChanged(idx);
-        }
-    }
-
-    public Expense getItemAt(int pos) {
-        return (pos >= 0 && pos < items.size()) ? items.get(pos) : null;
-    }
-
-    private int getId(Expense e) {
-        return e == null ? -1 : e.getId();
-    }
-
-    private int indexOfId(int id) {
-        for (int i = 0; i < items.size(); i++) if (getId(items.get(i)) == id) return i;
-        return -1;
-    }
-
-    private Set<Integer> getAllIds() {
-        Set<Integer> s = new HashSet<>();
-        for (Expense e : items) s.add(getId(e));
-        return s;
-    }
+    // ---------------- VIEW HOLDER ----------------
 
     static class VH extends RecyclerView.ViewHolder {
+
         TextView title, amount, date, description;
-        View selectionOverlay;
-        MaterialCheckBox selectionCheckbox; // optional
-        ImageButton btnMore; // optional
-        Chip categoryChip; // optional
+        MaterialCheckBox checkbox;
+        View overlay;
+        ImageButton more;
 
         VH(@NonNull View itemView) {
             super(itemView);
-            // required ids expected in your item_expense.xml
-            title = safeFindText(itemView, R.id.tv_expense_title);
-            amount = safeFindText(itemView, R.id.tv_expense_amount);
-            date = safeFindText(itemView, R.id.tv_expense_date);
-            description = safeFindText(itemView, R.id.tv_expense_description);
 
-            // optional: selection overlay / checkbox (may not exist in older layout)
-            View overlay = itemView.findViewById(R.id.selection_overlay);
-            selectionOverlay = overlay;
+            title = itemView.findViewById(R.id.tv_expense_title);
+            amount = itemView.findViewById(R.id.tv_expense_amount);
+            date = itemView.findViewById(R.id.tv_expense_date);
+            description = itemView.findViewById(R.id.tv_expense_description);
 
-            View maybeCheck = itemView.findViewById(R.id.selection_checkbox_overlay);
-            if (maybeCheck instanceof MaterialCheckBox) selectionCheckbox = (MaterialCheckBox) maybeCheck;
-            else {
-                View maybeCheck2 = itemView.findViewById(R.id.selection_checkbox);
-                if (maybeCheck2 instanceof MaterialCheckBox) selectionCheckbox = (MaterialCheckBox) maybeCheck2;
-                else selectionCheckbox = null;
-            }
-
-            // optional overflow button
-            View maybeBtn = itemView.findViewById(R.id.btn_show_expenses);
-            btnMore = (maybeBtn instanceof ImageButton) ? (ImageButton) maybeBtn : null;
-
-            // optional category chip
-            View maybeChip = itemView.findViewById(R.id.tv_expense_category);
-            categoryChip = (maybeChip instanceof Chip) ? (Chip) maybeChip : null;
-        }
-
-        // safe text lookup (returns empty TextView if missing to avoid NPEs)
-        private TextView safeFindText(View root, int id) {
-            View v = root.findViewById(id);
-            return (v instanceof TextView) ? (TextView) v : new TextView(root.getContext());
+            checkbox = itemView.findViewById(R.id.selection_checkbox);
+            overlay = itemView.findViewById(R.id.selection_overlay);
+            more = itemView.findViewById(R.id.btn_show_expenses);
         }
     }
 }
