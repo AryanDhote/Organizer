@@ -3,22 +3,16 @@ package com.my.organizer.fragments;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.*;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.LayoutInflater;
 
 import com.my.organizer.R;
 import com.my.organizer.adapters.ExpenseAdapter;
@@ -37,26 +31,18 @@ public class ExpenseListFragment extends Fragment {
     }
 
     private OnExpenseListActionListener listener;
-    private ExpenseViewModel expenseViewModel;
     private ExpenseAdapter adapter;
+    private ExpenseViewModel viewModel;
     private ActionMode actionMode;
+    private ExpenseViewModel expenseViewModel;
 
-    public ExpenseListFragment() { }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof OnExpenseListActionListener) {
             listener = (OnExpenseListActionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnExpenseListActionListener");
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
     }
 
     @Nullable
@@ -68,125 +54,95 @@ public class ExpenseListFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        expenseViewModel = new ViewModelProvider(requireActivity())
+                .get(ExpenseViewModel.class);
+
         RecyclerView rv = view.findViewById(R.id.rv_expenses_fragment);
-        View parent = view;
         View fab = view.findViewById(R.id.fab_add_expense);
 
         adapter = new ExpenseAdapter();
-        adapter.setSelectionEnabled(true);
-        adapter.setShowOverflow(true);
-
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         rv.setAdapter(adapter);
 
+        viewModel = new ViewModelProvider(requireActivity())
+                .get(ExpenseViewModel.class);
+
+        // ---------------- CLICK ----------------
         adapter.setOnExpenseClickListener(expense -> {
+
             if (actionMode != null) {
                 adapter.toggleSelection(expense);
-                updateActionModeTitle();
+                updateTitle();
+                adapter.notifyDataSetChanged(); // ✅ important
             } else {
                 if (listener != null) listener.onEditExpenseFromList(expense);
             }
         });
 
+        // ---------------- LONG CLICK ----------------
         adapter.setOnExpenseLongClickListener(expense -> {
+
             if (actionMode == null) {
-                actionMode = ((androidx.appcompat.app.AppCompatActivity) requireActivity())
+                actionMode = ((AppCompatActivity) requireActivity())
                         .startSupportActionMode(actionModeCallback);
             }
+
             adapter.toggleSelection(expense);
-            updateActionModeTitle();
+            updateTitle();
+            adapter.notifyDataSetChanged(); // ✅ important
         });
 
-        adapter.setOnExpenseActionListener(new ExpenseAdapter.OnExpenseActionListener() {
-            @Override
-            public void onEditExpense(Expense e) {
-                if (listener != null) listener.onEditExpenseFromList(e);
-            }
-            @Override
-            public void onDeleteExpense(Expense e) {
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Delete")
-                        .setMessage("Delete this expense?")
-                        .setPositiveButton("Delete", (d, which) -> {
-                            expenseViewModel.delete(e);
-                            Snackbar.make(parent, "Expense deleted", Snackbar.LENGTH_LONG)
-                                    .setAction("UNDO", v -> expenseViewModel.insert(e))
-                                    .show();
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            }
-        });
-
-        expenseViewModel = new ViewModelProvider(requireActivity()).get(ExpenseViewModel.class);
-        expenseViewModel.getAllExpenses().observe(getViewLifecycleOwner(), expenses -> {
+        // ---------------- DATA ----------------
+        viewModel.getAllExpenses().observe(getViewLifecycleOwner(), expenses -> {
             adapter.setExpenseList(expenses);
+
             if (adapter.getSelectedCount() == 0 && actionMode != null) {
                 actionMode.finish();
             }
         });
 
+        // ---------------- FAB ----------------
         fab.setOnClickListener(v -> {
             if (listener != null) listener.onAddExpenseFromList();
         });
-
-        // Swipe-to-delete with confirmation
-        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                  @NonNull RecyclerView.ViewHolder viewHolder,
-                                  @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int pos = viewHolder.getAdapterPosition();
-                Expense swiped = adapter.getItemAt(pos);
-
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Delete")
-                        .setMessage("Delete this expense?")
-                        .setPositiveButton("Delete", (d, which) -> {
-                            expenseViewModel.delete(swiped);
-                            Snackbar.make(parent, "Expense deleted", Snackbar.LENGTH_LONG)
-                                    .setAction("UNDO", v -> expenseViewModel.insert(swiped))
-                                    .show();
-                        })
-                        .setNegativeButton("Cancel", (d, which) -> adapter.notifyItemChanged(pos))
-                        .setOnCancelListener(dialog -> adapter.notifyItemChanged(pos))
-                        .show();
-            }
-        };
-        new ItemTouchHelper(swipeCallback).attachToRecyclerView(rv);
     }
 
+    // ---------------- ACTION MODE ----------------
+
     private final ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
+
         @Override
-        public boolean onCreateActionMode(ActionMode mode, android.view.Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_action_mode_delete, menu);
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.menu_action_mode_delete, menu);
             return true;
         }
 
         @Override
-        public boolean onPrepareActionMode(ActionMode mode, android.view.Menu menu) {
-            updateActionModeTitle();
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            updateTitle();
             return true;
         }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
             if (item.getItemId() == R.id.action_delete) {
-                List<Expense> deleted = new ArrayList<>(adapter.getSelectedItems());
-                if (!deleted.isEmpty()) {
-                    for (Expense e : deleted) {
-                        expenseViewModel.delete(e);
-                    }
+
+                List<Expense> selected = new ArrayList<>(adapter.getSelectedItems());
+
+                if (!selected.isEmpty()) {
+
+                    // ✅ MULTI DELETE FIX
+                    expenseViewModel.deleteBulk(selected);
+
+                    adapter.clearSelection();
                     mode.finish();
-                    Snackbar.make(requireView(), deleted.size() + " expense(s) deleted", Snackbar.LENGTH_LONG)
+
+                    Snackbar.make(requireView(),
+                                    selected.size() + " expense(s) deleted",
+                                    Snackbar.LENGTH_LONG)
                             .setAction("UNDO", v -> {
-                                for (Expense e : deleted) {
+                                for (Expense e : selected) {
                                     expenseViewModel.insert(e);
                                 }
                             }).show();
@@ -203,9 +159,9 @@ public class ExpenseListFragment extends Fragment {
         }
     };
 
-    private void updateActionModeTitle() {
-        if (actionMode == null) return;
-        int count = adapter.getSelectedCount();
-        actionMode.setTitle(count + " selected");
+    private void updateTitle() {
+        if (actionMode != null) {
+            actionMode.setTitle(adapter.getSelectedCount() + " selected");
+        }
     }
 }

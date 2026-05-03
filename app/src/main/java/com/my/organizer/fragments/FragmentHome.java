@@ -27,35 +27,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FragmentHome extends Fragment {
 
-    // Views
     private TextView tvTodoCount, tvExpenseTotal;
     private MaterialButton btnAddTodo, btnAddExpense, btnShowTodos, btnShowExpenses;
     private RecyclerView rvTodoPreview, rvExpensePreview;
 
-    // Adapters & ViewModels
     private ToDoAdapter toDoAdapter;
     private ExpenseAdapter expenseAdapter;
+
     private HomeViewModel homeViewModel;
     private ToDoViewModel toDoViewModel;
     private ExpenseViewModel expenseViewModel;
 
-    // Host callbacks
     public interface OnHomeActionListener {
         void onAddToDo();
         void onAddExpense();
         void onShowAllToDos();
         void onShowAllExpenses();
-
         void onEditToDo(ToDo toDo);
         void onEditExpense(Expense expense);
     }
-    private OnHomeActionListener listener;
 
-    public FragmentHome() { }
+    private OnHomeActionListener listener;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -63,7 +60,7 @@ public class FragmentHome extends Fragment {
         if (context instanceof OnHomeActionListener) {
             listener = (OnHomeActionListener) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement FragmentHome.OnHomeActionListener");
+            throw new RuntimeException(context.toString() + " must implement OnHomeActionListener");
         }
     }
 
@@ -82,6 +79,7 @@ public class FragmentHome extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         tvTodoCount = view.findViewById(R.id.tv_todo_count);
         tvExpenseTotal = view.findViewById(R.id.tv_expense_total);
 
@@ -93,68 +91,92 @@ public class FragmentHome extends Fragment {
         rvTodoPreview = view.findViewById(R.id.rv_todo_preview);
         rvExpensePreview = view.findViewById(R.id.rv_expense_preview);
 
-        toDoAdapter = new ToDoAdapter(requireContext());
+        // ✅ INIT ADAPTERS
+        toDoAdapter = new ToDoAdapter();
         expenseAdapter = new ExpenseAdapter();
 
-        // Home preview: disable selection and overflow. Taps open edit.
+        // ✅ DISABLE SELECTION MODE (VERY IMPORTANT)
         toDoAdapter.setSelectionEnabled(false);
         toDoAdapter.setShowOverflow(false);
+
         expenseAdapter.setSelectionEnabled(false);
         expenseAdapter.setShowOverflow(false);
 
+        // ✅ CLEAR ANY PREVIOUS SELECTION
+        toDoAdapter.clearSelection();
+        expenseAdapter.clearSelection();
+
+        // ✅ DISABLE LONG PRESS IN HOME
+        toDoAdapter.setOnToDoLongClickListener(null);
+        expenseAdapter.setOnExpenseLongClickListener(null);
+
+        // ✅ CLICK -> EDIT
         toDoAdapter.setOnToDoClickListener(toDo -> {
             if (listener != null) listener.onEditToDo(toDo);
         });
+
         expenseAdapter.setOnExpenseClickListener(expense -> {
             if (listener != null) listener.onEditExpense(expense);
         });
 
+        // ✅ SETUP RECYCLERS
         rvTodoPreview.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvTodoPreview.setAdapter(toDoAdapter);
 
         rvExpensePreview.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvExpensePreview.setAdapter(expenseAdapter);
 
+        // ✅ VIEWMODELS
         homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
         toDoViewModel = new ViewModelProvider(requireActivity()).get(ToDoViewModel.class);
         expenseViewModel = new ViewModelProvider(requireActivity()).get(ExpenseViewModel.class);
 
+        // ✅ TOTAL COUNTS
         homeViewModel.getTotalToDoCount().observe(getViewLifecycleOwner(), count -> {
-            int c = (count == null) ? 0 : count;
-            tvTodoCount.setText("Total Tasks: " + c);
+            tvTodoCount.setText("Total Tasks: " + (count == null ? 0 : count));
         });
 
         homeViewModel.getTotalExpenseAmount().observe(getViewLifecycleOwner(), amount -> {
-            double a = (amount == null) ? 0.0 : amount;
-            tvExpenseTotal.setText(String.format("Total Expenses: ₹%.2f", a));
+            tvExpenseTotal.setText(String.format("Total Expenses: ₹%.2f", amount == null ? 0 : amount));
         });
 
-        // previews (limit to 3)
-        toDoViewModel.getAllToDos().observe(getViewLifecycleOwner(), toDos -> {
-            List<ToDo> preview = takePreview(toDos, 3);
-            toDoAdapter.setToDoList(preview);
-            // ensure selection cleared and preview is read-only
-            toDoAdapter.clearSelection();
-            toDoAdapter.setSelectionEnabled(false);
+        // ✅ SHOW ONLY 2 LATEST TODOS
+        toDoViewModel.getAllToDos().observe(getViewLifecycleOwner(), list -> {
+            toDoAdapter.setToDoList(getLatestItems(list, 2));
         });
 
-        expenseViewModel.getAllExpenses().observe(getViewLifecycleOwner(), expenses -> {
-            List<Expense> preview = takePreview(expenses, 3);
-            expenseAdapter.setExpenseList(preview);
-            expenseAdapter.clearSelection();
-            expenseAdapter.setSelectionEnabled(false);
+        // ✅ SHOW ONLY 2 LATEST EXPENSES
+        expenseViewModel.getAllExpenses().observe(getViewLifecycleOwner(), list -> {
+            expenseAdapter.setExpenseList(getLatestItems(list, 2));
         });
 
-        btnAddTodo.setOnClickListener(v -> { if (listener != null) listener.onAddToDo(); });
-        btnAddExpense.setOnClickListener(v -> { if (listener != null) listener.onAddExpense(); });
+        // ✅ BUTTON ACTIONS
+        btnAddTodo.setOnClickListener(v -> {
+            if (listener != null) listener.onAddToDo();
+        });
 
-        btnShowTodos.setOnClickListener(v -> { if (listener != null) listener.onShowAllToDos(); });
-        btnShowExpenses.setOnClickListener(v -> { if (listener != null) listener.onShowAllExpenses(); });
+        btnAddExpense.setOnClickListener(v -> {
+            if (listener != null) listener.onAddExpense();
+        });
+
+        btnShowTodos.setOnClickListener(v -> {
+            if (listener != null) listener.onShowAllToDos();
+        });
+
+        btnShowExpenses.setOnClickListener(v -> {
+            if (listener != null) listener.onShowAllExpenses();
+        });
     }
 
-    private <T> List<T> takePreview(List<T> list, int limit) {
-        if (list == null) return new ArrayList<>();
-        if (list.size() <= limit) return list;
-        return new ArrayList<>(list.subList(0, limit));
+    // ✅ GET LATEST ITEMS (REVERSED)
+    private <T> List<T> getLatestItems(List<T> list, int limit) {
+        if (list == null || list.isEmpty()) return new ArrayList<>();
+
+        List<T> reversed = new ArrayList<>(list);
+        Collections.reverse(reversed);
+
+        if (reversed.size() <= limit) return reversed;
+
+        return reversed.subList(0, limit);
     }
 }

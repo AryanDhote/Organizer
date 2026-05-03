@@ -79,22 +79,15 @@ public class ExpenseViewModel extends AndroidViewModel {
      * Bulk delete given list of Expense objects.
      */
     public void deleteBulk(List<Expense> expenses) {
-        if (expenses == null || expenses.isEmpty()) {
-            deleteEvent.postValue(new Event<>(false));
-            return;
-        }
+        if (expenses == null || expenses.isEmpty()) return;
+
         final List<Integer> ids = new ArrayList<>();
         for (Expense e : expenses) {
             ids.add(e.getId());
         }
 
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            try {
-                repository.deleteByIds(ids);
-                deleteEvent.postValue(new Event<>(true));
-            } catch (Exception ex) {
-                deleteEvent.postValue(new Event<>(false));
-            }
+            repository.deleteByIds(ids);
         });
     }
 }
