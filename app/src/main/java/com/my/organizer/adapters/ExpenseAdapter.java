@@ -22,6 +22,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.VH> {
     }
 
     public void setShowOverflow(boolean b) {
+
     }
 
     public interface OnExpenseClickListener { void onClick(Expense e); }
