@@ -77,23 +77,13 @@ public class ToDoViewModel extends AndroidViewModel {
      * Bulk delete given list of ToDo objects by extracting their ids and calling repository.deleteByIds.
      * Posting a one-shot Event<Boolean> indicating success or failure.
      */
-    public void deleteBulk(List<ToDo> todos) {
-        if (todos == null || todos.isEmpty()) {
-            deleteEvent.postValue(new Event<>(false));
-            return;
-        }
-        final List<Integer> ids = new ArrayList<>();
-        for (ToDo t : todos) {
-            ids.add(t.getId());
-        }
+    public void deleteBulk(List<ToDo> list) {
+        if (list == null || list.isEmpty()) return;
 
-        AppDatabase.databaseWriteExecutor.execute(() -> {
-            try {
-                repository.deleteByIds(ids);
-                deleteEvent.postValue(new Event<>(true));
-            } catch (Exception ex) {
-                deleteEvent.postValue(new Event<>(false));
+        new Thread(() -> {
+            for (ToDo t : list) {
+                repository.delete(t);
             }
-        });
+        }).start();
     }
 }
